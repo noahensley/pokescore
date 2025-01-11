@@ -24,6 +24,16 @@ def load_data():
         messagebox.showerror("File Not Found", f"Could not find file: {e.filename}")
         exit()
 
+
+# Function to provide suggestions for similar Pokemon names
+def suggest_similar_names(pokemon_name, data):
+    suggestions = set()
+    for league_data in data.values():
+        similar_names = league_data[league_data['Pokemon'].str.lower().str.contains(pokemon_name[:3], na=False, regex=False)]
+        suggestions.update(similar_names['Pokemon'].tolist())
+    return list(suggestions)
+
+
 # Function to search for a Pokemon's best league and ranking
 def search_pokemon(data, ui_info):
     pokemon_name = ui_info.search_entry.get().strip().lower()
@@ -46,7 +56,12 @@ def search_pokemon(data, ui_info):
                 best_league = league_name
 
     if best_league is None:
-        ui_info.result_label.config(text=f"{pokemon_name.capitalize()} not found in any league.")
+        suggestions = suggest_similar_names(pokemon_name, data)
+        if suggestions:
+            suggestion_text = "Did you mean: " + ", ".join(suggestions) + "?"
+            ui_info.result_label.config(text=f"{pokemon_name.capitalize()} not found in any league.\n{suggestion_text}")
+        else:
+            ui_info.result_label.config(text=f"{pokemon_name.capitalize()} not found in any league.")
     else:
         ui_info.result_label.config(text=f"{pokemon_name.capitalize()} is ranked #{best_rank} "                                    
                                     f"with a score of {best_score} in the {best_league.capitalize()} League.")
@@ -57,25 +72,35 @@ def initialize_interface(data):
     # Create the main window
     root = tk.Tk()
     root.title("Go Battle League Pokemon Ranking")
-    root.geometry("400x200")
+    root.geometry("600x400")
+
+    # Configure the grid to expand dynamically
+    root.columnconfigure(0, weight=1)
+    root.rowconfigure(0, weight=1)
 
     # Create UI elements
     frame = ttk.Frame(root, padding="10")
     frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
 
+    frame.columnconfigure(1, weight=1)
+
     search_label = ttk.Label(frame, text="Enter Pokemon Name:")
-    search_label.grid(row=0, column=0, padx=5, pady=5)
+    search_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
 
-    search_entry = ttk.Entry(frame, width=30)
-    search_entry.grid(row=0, column=1, padx=5, pady=5)
-
-    result_label = ttk.Label(frame, text="", wraplength=300)
-    result_label.grid(row=1, column=0, columnspan=3, pady=10)
-
-    ui_info = UIInfo.UIInfo(search_entry, result_label)
+    search_entry = ttk.Entry(frame, width=50)
+    search_entry.grid(row=0, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
+    search_entry.focus_set()  # Automatically focus the search entry
 
     search_button = ttk.Button(frame, text="Search", command=lambda: search_pokemon(data, ui_info))
     search_button.grid(row=0, column=2, padx=5, pady=5)
+
+    result_label = ttk.Label(frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W)
+    result_label.grid(row=1, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+
+    ui_info = UIInfo.UIInfo(search_entry, result_label)
+
+    # Bind the Enter key to trigger the search
+    root.bind('<Return>', lambda event: search_pokemon(data, ui_info))
 
     # Start the main loop
     root.mainloop()
