@@ -38,8 +38,10 @@ def search_pokemon(data, ui_info):
     for league_name, league_data in data.items():
         result = league_data[league_data['Pokemon'].str.lower() == pokemon_name]
         if not result.empty:
-            score = result.iloc[0]['Score']
+            score = result.at[result.index[0], 'Score']  # Access the Score value without using iloc
+            rank = result.index[0] + 1  # Adjusting for 0-based indexing
             if score > best_score:  # Higher scores indicate better ranking
+                best_rank = rank
                 best_score = score
                 best_league = league_name
 
