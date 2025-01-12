@@ -7,6 +7,15 @@ import UIInfo
 
 
 def names_are_similar(n_longest, n_equalized, ch_error, len_error):
+    """
+    Check if two names are similar based on character and length differences.
+
+    :param n_longest: The longer name.
+    :param n_equalized: The equalized name for comparison.
+    :param ch_error: The maximum allowable character difference.
+    :param len_error: The maximum allowable length difference.
+    :return: True if names are similar; False otherwise.
+    """
     # Check for a length difference exceeding 3--excluding "()" tags
     if abs(len(n_longest.split(" (")[0]) - len(n_equalized.split(".")[0])) > len_error:
         return False
@@ -29,6 +38,13 @@ def names_are_similar(n_longest, n_equalized, ch_error, len_error):
  
 
 def equalize_names(supplied_name, data_name):
+    """
+    Equalize the lengths of two names by padding the shorter name with periods.
+
+    :param supplied_name: The name provided by the user.
+    :param data_name: The name from the dataset.
+    :return: A tuple of the longer name and the equalized shorter name.
+    """
     # Extract name data
     lowest_common_length, shortest_name, longest_name = (
         (len(data_name), supplied_name, data_name) if len(supplied_name) <= len(data_name) 
@@ -44,6 +60,11 @@ def equalize_names(supplied_name, data_name):
 
 
 def load_data():
+    """
+    Load Pokémon ranking data from CSV files for various leagues.
+
+    :return: A dictionary with league names as keys and Pandas DataFrames as values.
+    """
     try:
         # Import .csv rankings from pvpoke.com
         current_dir = os.path.dirname(os.path.abspath(__file__))
@@ -62,6 +83,13 @@ def load_data():
 
 
 def suggest_similar_names(pokemon_name, data):
+    """
+    Suggest similar Pokémon names based on the supplied name.
+
+    :param pokemon_name: The name of the Pokémon to search for.
+    :param data: The dataset containing Pokémon names and rankings.
+    :return: A list of up to 4 suggested Pokémon names.
+    """
     suggestions = set() 
     ch_error = len(pokemon_name) * 0.5
     len_error = 3
@@ -90,6 +118,12 @@ def suggest_similar_names(pokemon_name, data):
 
 
 def search_pokemon(data, ui_info):
+    """
+    Search for a Pokémon in the dataset and display its ranking or suggestions.
+
+    :param data: The dataset containing Pokémon rankings.
+    :param ui_info: The UIInfo object containing references to UI elements.
+    """
     supplied_name = ui_info.search_entry.get().strip().lower()
 
     # Clear the suggestion label before performing a new search
@@ -163,12 +197,24 @@ def display_suggestions(pokemon_name, ui_info, suggestions, data):
 
 
 def on_suggestion_click(suggestion, ui_info, data):
+    """
+    Handle a click on a suggestion button.
+
+    :param suggestion: The suggested Pokémon name.
+    :param ui_info: The UIInfo object containing references to UI elements.
+    :param data: The dataset containing Pokémon rankings.
+    """
     ui_info.search_entry.delete(0, tk.END)
     ui_info.search_entry.insert(0, suggestion)
     search_pokemon(data, ui_info)
 
 
 def initialize_interface(data):
+    """
+    Initialize the user interface for the Pokémon ranking search application.
+
+    :param data: The dataset containing Pokémon rankings.
+    """
     root = tk.Tk()
     root.title("Go Battle League Pokémon Ranking")
     root.geometry("600x500")
