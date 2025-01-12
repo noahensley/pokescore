@@ -4,8 +4,40 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import pandas as pd
-
 import UIInfo
+
+def names_are_similar(name1, name2, error):
+    if abs(len(name1.split(" (")[0]) - len(name2.split(" (")[0])) > 3:
+        return False
+    
+    diff = 0
+    for i in range(0,len(name1)):
+        if name1[i] is not name2[i]:
+            diff += 1
+    
+        if diff > error:
+            return False
+        
+        if name1[i] == " " or name2[i] == " ":
+            break
+        
+    return True
+ 
+
+def equalize_names(supplied_name, data_name):
+    # Equalize length of input and data names
+    lowest_common_length, shortest_name, longest_name = (
+        (len(data_name), supplied_name, data_name) if len(supplied_name) <= len(data_name) 
+        else (len(supplied_name), data_name, supplied_name)
+    )
+
+    equalized_name = shortest_name
+    # Equalize length of input-/data-name
+    for i in range(0, lowest_common_length - len(shortest_name)):
+        equalized_name += "."
+
+    return longest_name, equalized_name
+
 
 # Load the CSV data
 def load_data():
@@ -32,52 +64,28 @@ def suggest_similar_names(pokemon_name, data):
     # Estimate input error based on input length
     error = len(pokemon_name) * 0.5
 
-
     for league in data.values():
         for name in league["Pokemon"]:
+            # Convert both names to lower-case for comparison
             data_name = name.lower()
             supplied_name = pokemon_name.lower()
-            # Check for similarity
-            if supplied_name.find(data_name) != -1:
+            
+            # Equalize names using lowest common length
+            longest_name, equalized_name = equalize_names(supplied_name, data_name)
+
+            # Extract shortest name from equalized
+            # (equalized name is formatted 'name...')
+            shortest_name = equalized_name.split(".")[0]
+
+            if longest_name.find(shortest_name) != -1:
                 suggestions.add(name)
 
-            # Skip if the length difference is too long (minus () tags)
-            elif abs(len(supplied_name.split(" (")[0]) - len(data_name.split(" (")[0])) > 3:
-                continue
-
-            else:
-                # Determine equalizing length and shortest name
-                lowest_common_length = len(data_name)
-                shortest_name = supplied_name
-                longest_name = data_name
-                if len(supplied_name) > len(data_name):
-                    lowest_common_length = len(supplied_name)
-                    shortest_name = data_name
-                    longest_name = supplied_name
-
-                equalized_name = shortest_name
-                # Equalize length of input-/data-name
-                for i in range(0,lowest_common_length-len(shortest_name)):
-                    equalized_name += "."
-
-                diff = 0
-                # Compare differences
-                for i in range(0,lowest_common_length):
-                    if longest_name[i] is not equalized_name[i]:
-                        diff += 1
-                    
-                    if diff > error:
-                        break
-
-                    if longest_name[i] == " " or equalized_name[i] == " ":
-                        break
-
-                if diff <= error:
-                    suggestions.add(name)
+            elif names_are_similar(longest_name, equalized_name, error):
+                suggestions.add(name)
 
     # Sort suggestions alphabetically starting with the first letter of the supplied name
     sorted_suggestions = sorted(suggestions, key=lambda x: (x[0].lower() != pokemon_name[0].lower(), x))
-    
+
     # Limit to 4 suggestions
     return sorted_suggestions[:4]
 
