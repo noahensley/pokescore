@@ -28,16 +28,64 @@ def load_data():
 # Function to provide suggestions for similar Pokemon names
 def suggest_similar_names(pokemon_name, data):
     suggestions = set()
-    for league_data in data.values():
-        similar_names = league_data[league_data['Pokemon'].str.lower().str.contains(pokemon_name[:3], na=False, regex=False)]
-        suggestions.update(similar_names['Pokemon'].tolist())
-    return list(suggestions)
+
+    # Estimate input error based on input length
+    error = len(pokemon_name) * 0.5
+
+
+    for league in data.values():
+        for name in league["Pokemon"]:
+            data_name = name.lower()
+            supplied_name = pokemon_name.lower()
+            # Check for similarity
+            if supplied_name.find(data_name) != -1:
+                suggestions.add(name)
+
+            # Skip if the length difference is too long (minus () tags)
+            elif abs(len(supplied_name.split(" (")[0]) - len(data_name.split(" (")[0])) > 3:
+                continue
+
+            else:
+                # Determine equalizing length and shortest name
+                lowest_common_length = len(data_name)
+                shortest_name = supplied_name
+                longest_name = data_name
+                if len(supplied_name) > len(data_name):
+                    lowest_common_length = len(supplied_name)
+                    shortest_name = data_name
+                    longest_name = supplied_name
+
+                equalized_name = shortest_name
+                # Equalize length of input-/data-name
+                for i in range(0,lowest_common_length-len(shortest_name)):
+                    equalized_name += "."
+
+                diff = 0
+                # Compare differences
+                for i in range(0,lowest_common_length):
+                    if longest_name[i] is not equalized_name[i]:
+                        diff += 1
+                    
+                    if diff > error:
+                        break
+
+                    if longest_name[i] == " " or equalized_name[i] == " ":
+                        break
+
+                if diff <= error:
+                    suggestions.add(name)
+
+    # Sort suggestions alphabetically starting with the first letter of the supplied name
+    sorted_suggestions = sorted(suggestions, key=lambda x: (x[0].lower() != pokemon_name[0].lower(), x))
+    
+    # Limit to 4 suggestions
+    return sorted_suggestions[:4]
 
 
 # Function to search for a Pokemon's best league and ranking
 def search_pokemon(data, ui_info):
-    pokemon_name = ui_info.search_entry.get().strip().lower()
-    if not pokemon_name:
+    supplied_name = ui_info.search_entry.get().strip().lower()
+    if not supplied_name:
         messagebox.showwarning("Input Error", "Please enter a Pokemon name.")
         return
 
@@ -46,7 +94,7 @@ def search_pokemon(data, ui_info):
     best_league = None
 
     for league_name, league_data in data.items():
-        result = league_data[league_data['Pokemon'].str.lower() == pokemon_name]
+        result = league_data[league_data['Pokemon'].str.lower() == supplied_name]
         if not result.empty:
             score = result.at[result.index[0], 'Score']  # Access the Score value without using iloc
             rank = result.index[0] + 1  # Adjusting for 0-based indexing
@@ -56,14 +104,14 @@ def search_pokemon(data, ui_info):
                 best_league = league_name
 
     if best_league is None:
-        suggestions = suggest_similar_names(pokemon_name, data)
+        suggestions = suggest_similar_names(supplied_name, data)
         if suggestions:
             suggestion_text = "Did you mean: " + ", ".join(suggestions) + "?"
-            ui_info.result_label.config(text=f"{pokemon_name.capitalize()} not found in any league.\n{suggestion_text}")
+            ui_info.result_label.config(text=f"{supplied_name.capitalize()} not found in any league.\n{suggestion_text}")
         else:
-            ui_info.result_label.config(text=f"{pokemon_name.capitalize()} not found in any league.")
+            ui_info.result_label.config(text=f"{supplied_name.capitalize()} not found in any league.")
     else:
-        ui_info.result_label.config(text=f"{pokemon_name.capitalize()} is ranked #{best_rank} "                                    
+        ui_info.result_label.config(text=f"{supplied_name.capitalize()} is ranked #{best_rank} "                                    
                                     f"with a score of {best_score} in the {best_league.capitalize()} League.")
 
 
