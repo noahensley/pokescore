@@ -1,9 +1,10 @@
 import sys
+import os.path
 
 sys.path.append(".")
 sys.path.append("src")
 
-from src.utils import load_data, initialize_interface
+from ClassifyUtils import load_data, initialize_interface
 
 # Main program
 if __name__ == "__main__":

@@ -1,5 +1,4 @@
 
-
 class UIInfo:
     def __init__(self, search_entry, result_label, suggestions_frame):
         self.search_entry = search_entry
