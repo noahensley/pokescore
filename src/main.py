@@ -1,5 +1,4 @@
 import sys
-import os.path
 
 sys.path.append(".")
 sys.path.append("src")
