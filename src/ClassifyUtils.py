@@ -128,43 +128,63 @@ def search_pokemon(data, ui_info):
     """
     supplied_name = ui_info.search_entry.get().strip().lower()
 
-    # Clear the suggestion label before performing a new search
-    ui_info.result_label.config(text="")
-    ui_info.clear_suggestion_buttons()
-
     if not supplied_name:
         messagebox.showwarning("Input Error", "Please enter a Pokémon name.")
         return
-    
+
+    # Clear previous search results
+    ui_info.result_label.config(text="")
+    ui_info.clear_suggestion_buttons()
+    ui_info.show_all_ranks_checkbox.grid_remove()  # Hide checkbox initially
+
     # Initialize classification variables
     best_score = float('-inf')
-    best_rank = None
+    best_rank = float('inf')
     best_league = None
+    rank_scores = []  # Holds scores from all leagues
 
-    # Classify the supplied name of the Pokemon
+    # Search for the Pokémon in all leagues
     for league_name, league_data in data.items():
         result = league_data[league_data['Pokemon'].str.lower() == supplied_name]
         if not result.empty:
             score = result.at[result.index[0], 'Score']
             rank = result.index[0] + 1
-            if score > best_score:
+
+            # Store other rankings for later use
+            rank_scores.append(f"{league_name.capitalize()} League: Rank #{rank} (Score: {score})")
+
+            # Track best ranking
+            if rank < best_rank:
                 best_rank = rank
                 best_score = score
                 best_league = league_name
-    
-    # Generate suggestions if supplied name is not found
-    if best_league is None:
+
+    # If Pokémon was found
+    if best_league:
+        best_result_text = (f"{supplied_name.capitalize()} is ranked #{best_rank} "
+                            f"with a score of {best_score} in the {best_league.capitalize()} League.")
+        
+        # Remove best_league from rank_scores list
+        rank_scores = [entry for entry in rank_scores if not entry.startswith(f"{best_league.capitalize()} League")]
+
+        # Sort remaining leagues by highest rank (lowest rank number first)
+        rank_scores.sort(key=lambda entry: int(entry.split("#")[1].split()[0]))
+
+        # If the checkbox is checked, show all league ranks
+        if ui_info.do_show_all_ranks.get() and rank_scores:
+            best_result_text += "\n\nOther leagues:\n" + "\n".join(rank_scores)
+
+        ui_info.result_label.config(text=best_result_text)
+        ui_info.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)  # Show checkbox
+
+    # If Pokémon was not found, suggest similar names
+    else:
         suggestions = suggest_similar_names(supplied_name, data)
         if suggestions:
             display_suggestions(supplied_name, ui_info, suggestions, data)
         else:
             ui_info.result_label.config(text=f"{supplied_name.capitalize()} not found in any league.")
 
-    # Display the classification of the Pokemon with the supplied name
-    else:
-        ui_info.result_label.config(text=f"{supplied_name.capitalize()} is ranked #{best_rank} "
-                                         f"with a score of {best_score} in the {best_league.capitalize()} League.")
-        
     # Focus and select all text in the search entry
     ui_info.search_entry.focus_set()
     ui_info.search_entry.selection_range(0, tk.END)
@@ -240,10 +260,19 @@ def initialize_interface(data):
     result_label = ttk.Label(frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W)
     result_label.grid(row=1, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
 
-    suggestions_frame = ttk.Frame(frame)
-    suggestions_frame.grid(row=2, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+    # Checkbox for displaying other league scores (initially hidden)
+    do_show_all_ranks = tk.BooleanVar(value=False)
+    show_all_ranks_checkbox = ttk.Checkbutton(frame, text="Show scores in other leagues", variable=do_show_all_ranks,
+                                              command=lambda: search_pokemon(data, ui_info))
+    show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
+    show_all_ranks_checkbox.grid_remove()  # Hide initially
 
-    ui_info = UIInfo.UIInfo(search_entry, result_label, suggestions_frame)
+    # Frame for displaying suggestions
+    suggestions_frame = ttk.Frame(frame)
+    suggestions_frame.grid(row=3, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+
+    ui_info = UIInfo.UIInfo(search_entry, result_label, suggestions_frame, do_show_all_ranks, show_all_ranks_checkbox)
 
     root.bind('<Return>', lambda event: search_pokemon(data, ui_info))
     root.mainloop()
+
