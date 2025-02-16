@@ -5,7 +5,7 @@ from tkinter import messagebox
 import pandas as pd
 
 import UIInfo
-from FileUtils import get_relative_cwd
+from FileUtils import relative_path
 
 
 def names_are_similar(n_longest, n_equalized, ch_error, len_error):
@@ -69,10 +69,10 @@ def load_data():
     """
     try:
         # Import .csv rankings from pvpoke.com
-        current_dir = get_relative_cwd()
-        great_league = pd.read_csv(os.path.join(current_dir, '../data/cp1500_all_overall_rankings.csv'))
-        ultra_league = pd.read_csv(os.path.join(current_dir, '../data/cp2500_all_overall_rankings.csv'))
-        master_league = pd.read_csv(os.path.join(current_dir, '../data/cp10000_all_overall_rankings.csv'))
+        target_dir = relative_path(path_to_append="\\..\\data")
+        great_league = pd.read_csv(os.path.join(target_dir, 'cp1500_all_overall_rankings.csv'))
+        ultra_league = pd.read_csv(os.path.join(target_dir, 'cp2500_all_overall_rankings.csv'))
+        master_league = pd.read_csv(os.path.join(target_dir, 'cp10000_all_overall_rankings.csv'))
 
         return {
             'great': great_league,
