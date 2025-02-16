@@ -16,22 +16,31 @@ from selenium.common.exceptions import (
     ElementClickInterceptedException,
     StaleElementReferenceException,
 )
-from FileUtils import get_driver_file_path
 import threading
 import time
 import re
+import FileInfo
+from pathlib import Path
+from FileUtils import relative_path
 
+url1 = "https://pvpoke.com/rankings/all/1500/overall/"
+url2 = "https://pvpoke.com/rankings/all/2500/overall/"
+url3 = "https://pvpoke.com/rankings/all/10000/overall/"
 
 pattern = r"https://pvpoke\.com/rankings/all/(\d{4,5})/overall/"
 
 
 def initialize_fetch_csv():
+
+    fi = FileInfo.FileInfo()
+    fi.make_data_backup()
+
     gl_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=("https://pvpoke.com/rankings/all/1500/overall/",))
+                                     args=(url1,fi.data_path))
     ul_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=("https://pvpoke.com/rankings/all/2500/overall/",))
+                                     args=(url2,fi.data_path))
     ml_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=("https://pvpoke.com/rankings/all/10000/overall/",))
+                                     args=(url3,fi.data_path))
     
     gl_csv_thread.start()
     ul_csv_thread.start()
@@ -41,80 +50,50 @@ def initialize_fetch_csv():
     ul_csv_thread.join()
     ml_csv_thread.join()
 
-
-def wait_for_download(filename, download_dir, timeout=30):
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        if any(f.endswith(filename) for f in os.listdir(download_dir)):
-            print("Download complete!")
-            return True
-        time.sleep(1)
-    print("Timeout: File not found.")
-    return False
+    if not fi.download_successful():
+        fi.restore_data_backup()
 
 
-def format_csv_filename(url):
-    if type(url) != str:
+def fetch_csv(src, dst):
+    if type(src) != str:
         raise TypeError("Input URL must be a string.")
     
-    match = re.search(pattern, url)
+    match = re.search(pattern, src)
 
     if not match:
         raise RuntimeError("Unsupported URL format.")
-    
-    url = url.split("/")
-    fname = []
-    fname.append("cp" + url[5])
-    fname.append(url[4])
-    fname.append(url[6])
-    
-    return "_".join(fname)
-
-
-def fetch_csv(url):
-    if type(url) != str:
-        raise TypeError("Input URL must be a string.")
-    
-    match = re.search(pattern, url)
-
-    if not match:
-        raise RuntimeError("Unsupported URL format.")
-
-    download_dir = os.getcwd() + "\\data"
-    # copy_csv()
 
     try:
         # Initialize webdriver
         chrome_options = Options()
-        chrome_options.add_argument("--headless=new")
+        #chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--disable-usb-discovery")
         chrome_options.add_experimental_option("prefs", {
-            "download.default_directory": download_dir,  # Set download directory
+            "download.default_directory": dst,  # Set download directory
             "download.prompt_for_download": False,  # Auto-download files
             "download.directory_upgrade": True,
             "safebrowsing.enabled": True
         })
         
         driver = webdriver.Chrome(options=chrome_options)
-        wait = WebDriverWait(driver, 10)
-        driver.get(url)
+        wait = WebDriverWait(driver, 30)
+        driver.get(src)
 
-        # Export CSV data
+        # Download CSV data
         try:
             export_hyperlink = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Export to CSV")))
             export_hyperlink.click()
         except (TimeoutException, NoSuchElementException) as e:
             print(f"Error: Export link not found or not clickable - {e}")
-        
-        if wait_for_download(format_csv_filename(url), download_dir) == False:
-            # restore_csv()
-            pass
 
     except WebDriverException as e:
         print(f"WebDriver error: {e}")
 
     except (FileNotFoundError, PermissionError) as e:
         print(f"File system error: {e}")
+
+    except (ElementClickInterceptedException, StaleElementReferenceException) as e:
+        print(f"Element error: {e}")
 
     except Exception as e:
         print(f"Unexpected error: {e}")
@@ -124,6 +103,23 @@ def fetch_csv(url):
             driver.quit()  # Ensures cleanup even if an error occurs
 
 
+    def format_csv_filename(url):
+        if type(url) != str:
+            raise TypeError("Input URL must be a string.")
+        
+        match = re.search(pattern, url)
+
+        if not match:
+            raise RuntimeError("Unsupported URL format.")
+        
+        url = url.split("/")
+        fname = []
+        fname.append("cp" + url[5])
+        fname.append(url[4])
+        fname.append(url[6])
+        
+        return "_".join(fname)
+    
 initialize_fetch_csv()
 
 
