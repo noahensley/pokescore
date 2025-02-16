@@ -1,5 +1,5 @@
 
-class UIInfo:
+class UIInfo (object):
     def __init__(self, search_entry, result_label, suggestions_frame, do_show_all_ranks, show_all_ranks_checkbox):
         self.search_entry = search_entry
         self.result_label = result_label
