@@ -21,13 +21,12 @@ import time
 import re
 import FileInfo
 from pathlib import Path
-from FileUtils import relative_path
+from FileUtils import wait_for_download
 
-url1 = "https://pvpoke.com/rankings/all/1500/overall/"
-url2 = "https://pvpoke.com/rankings/all/2500/overall/"
-url3 = "https://pvpoke.com/rankings/all/10000/overall/"
+sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 
-pattern = r"https://pvpoke\.com/rankings/all/(\d{4,5})/overall/"
+from utils import core
+
 
 
 def initialize_fetch_csv():
@@ -35,12 +34,13 @@ def initialize_fetch_csv():
     fi = FileInfo.FileInfo()
     fi.make_data_backup()
 
+    """
     gl_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(url1,fi.data_path))
+                                     args=(core.url1,fi.data_path,))
     ul_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(url2,fi.data_path))
+                                     args=(core.url2,fi.data_path,))
     ml_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(url3,fi.data_path))
+                                     args=(core.url3,fi.data_path,))
     
     gl_csv_thread.start()
     ul_csv_thread.start()
@@ -49,6 +49,9 @@ def initialize_fetch_csv():
     gl_csv_thread.join()
     ul_csv_thread.join()
     ml_csv_thread.join()
+    """
+
+    fetch_csv(core.url1, fi.data_path)
 
     if not fi.download_successful():
         fi.restore_data_backup()
@@ -58,7 +61,7 @@ def fetch_csv(src, dst):
     if type(src) != str:
         raise TypeError("Input URL must be a string.")
     
-    match = re.search(pattern, src)
+    match = re.search(core.pattern, src)
 
     if not match:
         raise RuntimeError("Unsupported URL format.")
@@ -69,14 +72,14 @@ def fetch_csv(src, dst):
         #chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--disable-usb-discovery")
         chrome_options.add_experimental_option("prefs", {
-            "download.default_directory": dst,  # Set download directory
+            "download.default_directory": os.path.abspath(dst),  # Set download directory
             "download.prompt_for_download": False,  # Auto-download files
             "download.directory_upgrade": True,
             "safebrowsing.enabled": True
         })
         
         driver = webdriver.Chrome(options=chrome_options)
-        wait = WebDriverWait(driver, 30)
+        wait = WebDriverWait(driver, 10)
         driver.get(src)
 
         # Download CSV data
@@ -99,26 +102,10 @@ def fetch_csv(src, dst):
         print(f"Unexpected error: {e}")
 
     finally:
+        wait_for_download(url=src, dst=dst)
         if 'driver' in locals():
             driver.quit()  # Ensures cleanup even if an error occurs
 
-
-    def format_csv_filename(url):
-        if type(url) != str:
-            raise TypeError("Input URL must be a string.")
-        
-        match = re.search(pattern, url)
-
-        if not match:
-            raise RuntimeError("Unsupported URL format.")
-        
-        url = url.split("/")
-        fname = []
-        fname.append("cp" + url[5])
-        fname.append(url[4])
-        fname.append(url[6])
-        
-        return "_".join(fname)
     
 initialize_fetch_csv()
 

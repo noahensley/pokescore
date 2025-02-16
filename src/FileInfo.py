@@ -3,7 +3,7 @@ import tempfile
 import shutil
 from FileUtils import relative_path
 import re
-import time
+
 
 class FileInfo(object):
 
@@ -12,11 +12,8 @@ class FileInfo(object):
         # Path to the /data directory
         self.data_path = relative_path(path_to_append="\\..\\data")
 
-        # TemporaryDirectory object for backups
-        self.td_backup_dir = tempfile.mkdtemp(dir=self.data_path)
-
         # Path to temporary directory
-        self.backup_path = str(self.td_backup_dir)
+        self.backup_path = tempfile.mkdtemp(dir=self.data_path)
 
 
     def make_data_backup(self):
@@ -32,11 +29,9 @@ class FileInfo(object):
         self.delete_csv()
 
         # Move files from temp directory to /data
-        for file in os.listdir(self.backup_path):
-            file_path = self.backup_path + "\\" + file
-            shutil.move(file_path, self.data_path)
+        self.restore_csv()
 
-        self.backup_path.cleanup()
+        os.rmdir(self.backup_path)
 
 
     def download_successful(self):
@@ -44,26 +39,13 @@ class FileInfo(object):
         #  .csv files
         dup_pattern = r"\(\d+\)"
         count = 0
-        if self.wait_for_download(".csv"):
-            for file in os.listdir(self.data_path):
-                if file.endswith(".csv") and re.search(dup_pattern, file) == None:
-                    count += 1
-                else:
-                    count -= 1
+        for file in os.listdir(self.data_path):
+            if file.endswith(".csv") and re.search(dup_pattern, file) == None:
+                count += 1
+            else:
+                count -= 1
             
         return count == 3
-    
-
-    def wait_for_download(self, filename, timeout=30):
-        start_time = time.time()
-        while time.time() - start_time < timeout:
-            if any(f.endswith(filename) for f in os.listdir(self.data_path)):
-                print("Download complete!")
-                return True
-            time.sleep(1)
-        print("Timeout: File not found.")
-        return False
-
 
 
     # Make a copy of the CSV files currently in /data
@@ -92,5 +74,3 @@ class FileInfo(object):
             if file.endswith(".csv"):
                 file_path = self.backup_path + "\\" + file
                 shutil.move(file_path, self.data_path)
-
-        self.backup_path.cleanup()
