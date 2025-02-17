@@ -4,12 +4,11 @@ from tkinter import ttk
 from tkinter import messagebox
 import pandas as pd
 import threading
-from datetime import datetime
+import queue
 from pytz import timezone
 
 import UIInfo
 from FileUtils import relative_path
-from WebUtils import initialize_fetch_csv
 
 
 def names_are_similar(n_longest, n_equalized, ch_error, len_error):
@@ -273,8 +272,7 @@ def initialize_interface(data):
     result_label = ttk.Label(frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W)
     result_label.grid(row=1, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
 
-    download_button = ttk.Button(download_frame, text="Download Assets",
-                             command=lambda: download_assets(ui_info))
+    download_button = ttk.Button(download_frame, text="Download Assets")
     download_button.grid(row=0, column=0, padx=0, pady=0, sticky=tk.W)
 
     download_label = ttk.Label(download_frame, text="", foreground="blue")
@@ -296,69 +294,9 @@ def initialize_interface(data):
                             result_label, download_button, download_label,
                             do_show_all_ranks, show_all_ranks_checkbox)
 
-    download_button.config(command=lambda: download_assets(ui_info))  # Assign command after ui_info is created
-
+    # Assign command after ui_info is created
+    download_button.config(command=lambda: ui_info.download_assets())
 
     root.bind('<Return>', lambda event: search_pokemon(data, ui_info))
     root.mainloop()
-
-
-def download_assets(ui_info):
-    """Starts the download process in a separate thread with a timeout safeguard."""
-    
-    def perform_download():
-        """Perform the actual file download and update UI accordingly."""
-        try:
-            initialize_fetch_csv()
-            if not timeout_event.is_set():  # Update UI only if download completes before timeout
-                #tz = timezone("EST")
-                ui_info.download_label.config(text=f"Download complete!")
-        except Exception as e:
-            ui_info.download_label.config(text=f"Error: {e}", foreground="red")
-        finally:
-            reenable_ui()
-            
-        timeout_event.set()  # Mark the task as done (whether it succeeded or failed)
-
-    def cancel_download():
-        """Handle timeout scenario."""
-        if not timeout_event.is_set():
-            ui_info.download_label.config(text="Download timed out. Please try again.", foreground="red")
-            reenable_ui()
-            timeout_event.set()
-
-    def disable_close():
-        """Disable the window's close (X) button."""
-        ui_info.root.protocol("WM_DELETE_WINDOW", lambda: None)  # Ignore close button
-
-    def reenable_close():
-        """Re-enable the close button after download finishes."""
-        ui_info.root.protocol("WM_DELETE_WINDOW", ui_info.root.destroy)  # Restore normal behavior
-
-    def disable_ui():
-        """Disable UI elements during download."""
-        ui_info.search_entry.config(state=tk.DISABLED)
-        ui_info.search_button.config(state=tk.DISABLED)
-        ui_info.download_assets_button.config(state=tk.DISABLED)
-        disable_close()  # Disable close button
-
-    def reenable_ui():
-        """Re-enable UI elements after download."""
-        ui_info.search_entry.config(state=tk.NORMAL)
-        ui_info.search_button.config(state=tk.NORMAL)
-        ui_info.download_assets_button.config(state=tk.NORMAL)
-        reenable_close()  # Restore close button
-
-    # Disable UI and update status
-    ui_info.download_label.config(text="Downloading assets...", foreground="blue")
-    disable_ui()
-
-    timeout_event = threading.Event()  # Used to track if download finished
-    download_thread = threading.Thread(target=perform_download, daemon=True)
-    download_thread.start()
-
-    # Set a timeout (e.g., 5 seconds) to check if the thread is still running
-    timeout_seconds = 15
-    timeout_timer = threading.Timer(timeout_seconds, cancel_download)
-    timeout_timer.start()
 
