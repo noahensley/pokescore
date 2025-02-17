@@ -17,6 +17,14 @@ class FileInfo(object):
         self.backup_path = tempfile.mkdtemp(dir=self.data_path)
 
 
+    def discard_backup(self):
+        # Deletes the backup files
+        self.delete_backup()
+
+        # Removes the backup directory
+        os.rmdir(self.backup_path)
+
+
     def make_data_backup(self):
         # Make a backup of the current csv files
         self.copy_csv()
@@ -77,3 +85,10 @@ class FileInfo(object):
             if file.endswith(".csv"):
                 file_path = self.backup_path + "\\" + file
                 shutil.move(file_path, self.data_path)
+
+
+    # Delete the files from the backup directory
+    def delete_backup(self):
+        for file in os.listdir(self.backup_path):
+            file_path = self.backup_path + "\\" + file
+            os.remove(file_path)
