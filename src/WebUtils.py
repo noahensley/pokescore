@@ -101,8 +101,5 @@ def fetch_csv(src, dst):
         if 'driver' in locals():
             driver.quit()  # Ensures cleanup even if an error occurs
 
-    
-initialize_fetch_csv()
-
 
     
