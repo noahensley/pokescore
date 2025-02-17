@@ -2,7 +2,8 @@ import os
 import tempfile
 import shutil
 from FileUtils import relative_path
-import re
+from FileUtils import format_csv_filename
+from utils import core
 
 
 class FileInfo(object):
@@ -34,18 +35,20 @@ class FileInfo(object):
         os.rmdir(self.backup_path)
 
 
-    def download_successful(self):
+    def downloads_successful(self):
         # Checks the /data directory for exactly three
         #  .csv files
-        dup_pattern = r"\(\d+\)"
-        count = 0
+        target_files = []
+        for url in core.urls.values():
+            target_files.append(format_csv_filename(url))
+
+        downloaded_files = []
         for file in os.listdir(self.data_path):
-            if file.endswith(".csv") and re.search(dup_pattern, file) == None:
-                count += 1
-            else:
-                count -= 1
-            
-        return count == 3
+            if os.path.isfile(file):
+                if not file.endswith(".gitignore"):
+                    downloaded_files.append(file)
+
+        return sorted(target_files) == sorted(downloaded_files)
 
 
     # Make a copy of the CSV files currently in /data

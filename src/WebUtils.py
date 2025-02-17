@@ -28,19 +28,17 @@ sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
 from utils import core
 
 
-
 def initialize_fetch_csv():
 
     fi = FileInfo.FileInfo()
     fi.make_data_backup()
 
-    """
     gl_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(core.url1,fi.data_path,))
+                                     args=(core.urls["great"],fi.data_path,))
     ul_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(core.url2,fi.data_path,))
+                                     args=(core.urls["ultra"],fi.data_path,))
     ml_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(core.url3,fi.data_path,))
+                                     args=(core.urls["master"],fi.data_path,))
     
     gl_csv_thread.start()
     ul_csv_thread.start()
@@ -49,11 +47,8 @@ def initialize_fetch_csv():
     gl_csv_thread.join()
     ul_csv_thread.join()
     ml_csv_thread.join()
-    """
 
-    fetch_csv(core.url1, fi.data_path)
-
-    if not fi.download_successful():
+    if not fi.downloads_successful():
         fi.restore_data_backup()
 
 
@@ -69,7 +64,7 @@ def fetch_csv(src, dst):
     try:
         # Initialize webdriver
         chrome_options = Options()
-        #chrome_options.add_argument("--headless=new")
+        chrome_options.add_argument("--headless=new")
         chrome_options.add_argument("--disable-usb-discovery")
         chrome_options.add_experimental_option("prefs", {
             "download.default_directory": os.path.abspath(dst),  # Set download directory
