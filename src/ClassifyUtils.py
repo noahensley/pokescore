@@ -3,9 +3,13 @@ import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
 import pandas as pd
+import threading
+from datetime import datetime
+from pytz import timezone
 
 import UIInfo
 from FileUtils import relative_path
+from WebUtils import initialize_fetch_csv
 
 
 def names_are_similar(n_longest, n_equalized, ch_error, len_error):
@@ -245,10 +249,19 @@ def initialize_interface(data):
 
     frame = ttk.Frame(root, padding="10")
     frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-    frame.columnconfigure(1, weight=1)
+    frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame)
+    frame.grid_columnconfigure(1, weight=1)  # Search entry should expand
+    frame.grid_columnconfigure(2, weight=0)  # Right-side elements (buttons)
+    frame.grid_rowconfigure(99, weight=1)  # Push bottom_frame to the bottom
+
+    download_frame = ttk.Frame(frame)
+    download_frame.grid(row=99, column=0, columnspan=2, sticky=tk.SW)
 
     search_label = ttk.Label(frame, text="Enter Pokémon Name:")
     search_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
+
+    download_label = ttk.Label(frame, text="", foreground="blue")
+    download_label.grid(row=0, column=0, padx=0, pady=0, sticky=tk.W)
 
     search_entry = ttk.Entry(frame, width=50)
     search_entry.grid(row=0, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
@@ -259,6 +272,13 @@ def initialize_interface(data):
 
     result_label = ttk.Label(frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W)
     result_label.grid(row=1, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+
+    download_button = ttk.Button(download_frame, text="Download Assets",
+                             command=lambda: download_assets(ui_info))
+    download_button.grid(row=0, column=0, padx=0, pady=0, sticky=tk.W)
+
+    download_label = ttk.Label(download_frame, text="", foreground="blue")
+    download_label.grid(row=0, column=1, padx=5, pady=1, sticky=tk.W)
 
     # Checkbox for displaying other league scores (initially hidden)
     do_show_all_ranks = tk.BooleanVar(value=False)
@@ -271,8 +291,74 @@ def initialize_interface(data):
     suggestions_frame = ttk.Frame(frame)
     suggestions_frame.grid(row=3, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
 
-    ui_info = UIInfo.UIInfo(search_entry, result_label, suggestions_frame, do_show_all_ranks, show_all_ranks_checkbox)
+    ui_info = UIInfo.UIInfo(root, frame, download_frame, suggestions_frame,
+                            search_label, search_button, search_entry, 
+                            result_label, download_button, download_label,
+                            do_show_all_ranks, show_all_ranks_checkbox)
+
+    download_button.config(command=lambda: download_assets(ui_info))  # Assign command after ui_info is created
+
 
     root.bind('<Return>', lambda event: search_pokemon(data, ui_info))
     root.mainloop()
+
+
+def download_assets(ui_info):
+    """Starts the download process in a separate thread with a timeout safeguard."""
+    
+    def perform_download():
+        """Perform the actual file download and update UI accordingly."""
+        try:
+            initialize_fetch_csv()
+            if not timeout_event.is_set():  # Update UI only if download completes before timeout
+                #tz = timezone("EST")
+                ui_info.download_label.config(text=f"Download complete!")
+        except Exception as e:
+            ui_info.download_label.config(text=f"Error: {e}", foreground="red")
+        finally:
+            reenable_ui()
+            
+        timeout_event.set()  # Mark the task as done (whether it succeeded or failed)
+
+    def cancel_download():
+        """Handle timeout scenario."""
+        if not timeout_event.is_set():
+            ui_info.download_label.config(text="Download timed out. Please try again.", foreground="red")
+            reenable_ui()
+            timeout_event.set()
+
+    def disable_close():
+        """Disable the window's close (X) button."""
+        ui_info.root.protocol("WM_DELETE_WINDOW", lambda: None)  # Ignore close button
+
+    def reenable_close():
+        """Re-enable the close button after download finishes."""
+        ui_info.root.protocol("WM_DELETE_WINDOW", ui_info.root.destroy)  # Restore normal behavior
+
+    def disable_ui():
+        """Disable UI elements during download."""
+        ui_info.search_entry.config(state=tk.DISABLED)
+        ui_info.search_button.config(state=tk.DISABLED)
+        ui_info.download_assets_button.config(state=tk.DISABLED)
+        disable_close()  # Disable close button
+
+    def reenable_ui():
+        """Re-enable UI elements after download."""
+        ui_info.search_entry.config(state=tk.NORMAL)
+        ui_info.search_button.config(state=tk.NORMAL)
+        ui_info.download_assets_button.config(state=tk.NORMAL)
+        reenable_close()  # Restore close button
+
+    # Disable UI and update status
+    ui_info.download_label.config(text="Downloading assets...", foreground="blue")
+    disable_ui()
+
+    timeout_event = threading.Event()  # Used to track if download finished
+    download_thread = threading.Thread(target=perform_download, daemon=True)
+    download_thread.start()
+
+    # Set a timeout (e.g., 5 seconds) to check if the thread is still running
+    timeout_seconds = 15
+    timeout_timer = threading.Timer(timeout_seconds, cancel_download)
+    timeout_timer.start()
 
