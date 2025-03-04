@@ -1,10 +1,12 @@
-from pathlib import Path
 import sys
 import time
 import re
-import os
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+from pathlib import Path
+
+base_path = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
+sys.path.append(str(base_path))
+sys.path.append(str(base_path.parent))
 
 from utils import core
 

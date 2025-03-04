@@ -1,7 +1,7 @@
 import sys
 import os.path
 
-sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+# sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
@@ -14,7 +14,9 @@ import time
 import re
 from pathlib import Path
 
-sys.path.append(os.path.abspath(os.path.join(os.path.dirname(__file__), "..")))
+base_path = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
+sys.path.append(str(base_path))
+sys.path.append(str(base_path.parent))
 
 from utils import core
 

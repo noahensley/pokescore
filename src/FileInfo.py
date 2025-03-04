@@ -1,8 +1,16 @@
 import os
+import sys
 import tempfile
 import shutil
 from FileUtils import relative_path
 from FileUtils import format_csv_filename
+
+from pathlib import Path
+
+base_path = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
+sys.path.append(str(base_path))
+sys.path.append(str(base_path.parent))
+
 from utils import core
 
 
