@@ -1,6 +1,9 @@
+import os
 import sys
 import time
 import re
+from tkinter import messagebox
+import pandas as pd
 
 from pathlib import Path
 
@@ -34,6 +37,29 @@ def format_csv_filename(url):
     fname.append("rankings")
 
     return "_".join(fname) + ".csv"
+
+
+def load_data():
+    """
+    Load Pokémon ranking data from CSV files for various leagues.
+
+    :return: A dictionary with league names as keys and Pandas DataFrames as values.
+    """
+    try:
+        # Import .csv rankings from pvpoke.com
+        target_dir = relative_path(path_to_append="\\..\\data")
+        great_league = pd.read_csv(os.path.join(target_dir, 'cp1500_all_overall_rankings.csv'))
+        ultra_league = pd.read_csv(os.path.join(target_dir, 'cp2500_all_overall_rankings.csv'))
+        master_league = pd.read_csv(os.path.join(target_dir, 'cp10000_all_overall_rankings.csv'))
+
+        return {
+            'great': great_league,
+            'ultra': ultra_league,
+            'master': master_league
+        }
+    except FileNotFoundError as e:
+        messagebox.showerror("File Not Found", f"Could not find file: {e.filename}")
+        exit()
 
 
 def wait_for_download(url, dst, timeout=15):
