@@ -61,24 +61,31 @@ def fetch_csv(q, src, dst):
             "safebrowsing.enabled": True
         })
         
-        driver = webdriver.Chrome(options=chrome_options)
-        wait = WebDriverWait(driver, 10)
-        driver.get(src)
+        try:
+            driver = webdriver.Chrome(options=chrome_options)
+            wait = WebDriverWait(driver, 10)
+            driver.set_page_load_timeout(20)
+            driver.get(src)
+
+        except Exception as e:
+            print(f"Error loading page: {e}")
+            q.put(e)
+            return
 
         # Download CSV data
         export_hyperlink = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Export to CSV")))
         export_hyperlink.click()
+
+        time.sleep(2) # Wait for download to complete
+        q.put(None)
 
     except Exception as e:
         print(f"Unexpected error: {e}")
         q.put(e)
 
     finally:
-        time.sleep(2) # Wait for download to complete
         if 'driver' in locals():
             driver.quit()  # Ensures cleanup even if an error occurs
-
-    q.put(None)
 
 
     
