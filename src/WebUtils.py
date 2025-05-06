@@ -66,6 +66,7 @@ def fetch_csv(q, src, dst):
             wait = WebDriverWait(driver, 10)
             driver.set_page_load_timeout(20)
             driver.get(src)
+            time.sleep(2)
 
         except Exception as e:
             print(f"Error loading page: {e}")
