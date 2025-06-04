@@ -22,6 +22,7 @@ class UIInfo (object):
         self.csv_data = FileUtils.load_data()
         self.suggestion_buttons = []
         self.except_queue = queue.Queue()
+        self.result_info = {}
 
         self.root = tk.Tk()
         self.root.title("Go Battle League Pokémon Ranking")
@@ -68,7 +69,7 @@ class UIInfo (object):
                         self.frame, 
                         text="Show scores in other leagues", 
                         variable=self.do_show_all_ranks,
-                        command=lambda: self.search_pokemon()
+                        command=lambda: self.populate_result_label()
                     )
         
         # Logic/checkbox for displaying moveset (initially hidden)
@@ -77,7 +78,7 @@ class UIInfo (object):
                         self.frame, 
                         text="Show moveset", 
                         variable=self.do_show_moveset,
-                        command=lambda: self.search_pokemon()
+                        command=lambda: self.populate_result_label()
                     )
         
         self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
@@ -118,6 +119,7 @@ class UIInfo (object):
         best_rank = float('inf')
         best_league = None
         rank_scores = []  # Holds scores from all leagues
+        result = None
 
         # Search for the Pokémon in all leagues
         for league_name, league_data in self.csv_data.items():
@@ -135,43 +137,37 @@ class UIInfo (object):
                     best_score = score
                     best_league = league_name
 
+                    # NOTE: This assignment assumes the moves do not change among leagues.
+                    self.result_info['Fast Move'] = result.at[result.index[0], 'Fast Move']
+                    self.result_info['Charged Move 1'] = result.at[result.index[0], 'Charged Move 1']
+                    self.result_info['Charged Move 2'] = result.at[result.index[0], 'Charged Move 2']
+
         # If Pokémon was found
-        if best_league:
-            best_result_text = (f"{supplied_name.capitalize()} is ranked #{best_rank} "
-                                f"with a score of {best_score} in the {best_league.capitalize()} League.")
-            
+        self.result_info['Name'] = supplied_name.capitalize()
+        if best_league:   
             # Remove best_league from rank_scores list
             rank_scores = [entry for entry in rank_scores if not entry.startswith(f"{best_league.capitalize()} League")]
 
             # Sort remaining leagues by highest rank (lowest rank number first)
             rank_scores.sort(key=lambda entry: int(entry.split("#")[1].split()[0]))
 
-            # If 'moveset' checkbox is checked, show movesets
-            if self.do_show_moveset.get() and not result.empty:
-                fast_move = result.at[result.index[0], 'Fast Move']
-                charged_move1 = result.at[result.index[0], 'Charged Move 1']
-                charged_move2 = result.at[result.index[0], 'Charged Move 2']
-                best_result_text += f"\nBest moveset: {fast_move}, {charged_move1}, {charged_move2}"
+            # Add the search result info
+            self.result_info['Rank'] = best_rank
+            self.result_info['Score'] = best_score
+            self.result_info['League'] = best_league.capitalize()
 
-            # If the 'other leagues' checkbox is checked, show all league ranks
-            if self.do_show_all_ranks.get() and rank_scores:
-                best_result_text += "\n\nOther leagues:\n" + "\n".join(rank_scores) 
-
-            # Display other league info label
-            self.result_label.config(text=best_result_text)
+            self.result_info['Other Leagues'] = "\n".join(rank_scores)
+            self.result_info['Found'] = True
 
             # Display 'other leagues' checkbox
             self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
             # Display 'moveset' checkbox
             self.show_moveset_checkbox.grid(row=3, column=0, columnspan=3, pady=5, sticky=tk.W)
 
-        # If Pokémon was not found, suggest similar names
         else:
-            suggestions = ClassifyUtils.suggest_similar_names(supplied_name, self.csv_data)
-            if suggestions:
-                self.display_suggestions(supplied_name, suggestions)
-            else:
-                self.result_label.config(text=f"{supplied_name.capitalize()} not found in any league.")
+            self.result_info['Found'] = False
+        
+        self.populate_result_label()
 
         # Focus and select all text in the search entry
         self.search_entry.focus_set()
@@ -187,11 +183,11 @@ class UIInfo (object):
         :param ui_info: The UIInfo object containing references to UI elements.
         :param data: The data dictionary with league information.
         """
-        # Display the "not found" message
-        self.result_label.config(text=f"{pokemon_name.capitalize()} not found in any league.\nDid you mean one of these?")
-
         # Clear any previous suggestion buttons
         self.suggestion_buttons.clear()
+
+        # Display the "not found" message
+        self.result_label.config(text=f"{self.result_info['Name']} not found in any League.\nDid you mean one of these?")
 
         # Create buttons for each suggestion using grid
         for idx, name in enumerate(suggestions):
@@ -267,3 +263,31 @@ class UIInfo (object):
 
         fetch_thread = threading.Thread(target=perform_download)
         fetch_thread.start()
+
+
+    def populate_result_label(self):
+        result_text = ""
+        if not self.result_info:
+            self.result_label.config(text=result_text)
+            return
+        
+        if not self.result_info['Found']:
+            suggestions = ClassifyUtils.suggest_similar_names(self.result_info['Name'], self.csv_data)
+            if suggestions:
+                self.display_suggestions(self.result_info['Name'], suggestions)
+            else:
+                self.result_label.config(text=f"{self.result_info['Name']} not found in any league.")
+            return
+        
+        result_text += (f"{self.result_info['Name']} is ranked {self.result_info['Rank']} "
+        f"with a score of {self.result_info['Score']} in the {self.result_info['League']} League.")
+        
+        if self.do_show_moveset.get():
+            result_text += (f"\nBest moveset: {self.result_info['Fast Move']}, "
+            f"{self.result_info['Charged Move 1']}, "
+            f"{self.result_info['Charged Move 2']}")
+
+        if self.do_show_all_ranks.get():
+            result_text += f"\n\nOther leagues:\n{self.result_info['Other Leagues']}"
+
+        self.result_label.config(text=result_text)
