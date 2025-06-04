@@ -62,7 +62,7 @@ class UIInfo (object):
         self.download_label = ttk.Label(self.download_frame, text="", foreground="blue")
         self.download_label.grid(row=0, column=1, padx=5, pady=1, sticky=tk.W)
 
-        # Checkbox for displaying other league scores (initially hidden)
+        # Logic/checkbox for displaying other league scores (initially hidden)
         self.do_show_all_ranks = tk.BooleanVar(value=False)
         self.show_all_ranks_checkbox = ttk.Checkbutton(
                         self.frame, 
@@ -71,8 +71,19 @@ class UIInfo (object):
                         command=lambda: self.search_pokemon()
                     )
         
+        # Logic/checkbox for displaying moveset (initially hidden)
+        self.do_show_moveset = tk.BooleanVar(value=False)
+        self.show_moveset_checkbox = ttk.Checkbutton(
+                        self.frame, 
+                        text="Show moveset", 
+                        variable=self.do_show_moveset,
+                        command=lambda: self.search_pokemon()
+                    )
+        
         self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
         self.show_all_ranks_checkbox.grid_remove()  # Hide initially
+        self.show_moveset_checkbox.grid(row=3, column=0, columnspan=3, pady=5, stick=tk.W)
+        self.show_moveset_checkbox.grid_remove()
 
         # Frame for displaying suggestions
         self.suggestions_frame = ttk.Frame(self.frame)
@@ -98,7 +109,9 @@ class UIInfo (object):
         # Clear previous search results
         self.result_label.config(text="")
         self.clear_suggestion_buttons()
-        self.show_all_ranks_checkbox.grid_remove()  # Hide checkbox initially
+        # Hide checkboxes each search
+        self.show_all_ranks_checkbox.grid_remove()
+        self.show_moveset_checkbox.grid_remove()
 
         # Initialize classification variables
         best_score = float('-inf')
@@ -133,12 +146,24 @@ class UIInfo (object):
             # Sort remaining leagues by highest rank (lowest rank number first)
             rank_scores.sort(key=lambda entry: int(entry.split("#")[1].split()[0]))
 
-            # If the checkbox is checked, show all league ranks
-            if self.do_show_all_ranks.get() and rank_scores:
-                best_result_text += "\n\nOther leagues:\n" + "\n".join(rank_scores)
+            # If 'moveset' checkbox is checked, show movesets
+            if self.do_show_moveset.get() and not result.empty:
+                fast_move = result.at[result.index[0], 'Fast Move']
+                charged_move1 = result.at[result.index[0], 'Charged Move 1']
+                charged_move2 = result.at[result.index[0], 'Charged Move 2']
+                best_result_text += f"\nBest moveset: {fast_move}, {charged_move1}, {charged_move2}"
 
+            # If the 'other leagues' checkbox is checked, show all league ranks
+            if self.do_show_all_ranks.get() and rank_scores:
+                best_result_text += "\n\nOther leagues:\n" + "\n".join(rank_scores) 
+
+            # Display other league info label
             self.result_label.config(text=best_result_text)
-            self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)  # Show checkbox
+
+            # Display 'other leagues' checkbox
+            self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
+            # Display 'moveset' checkbox
+            self.show_moveset_checkbox.grid(row=3, column=0, columnspan=3, pady=5, sticky=tk.W)
 
         # If Pokémon was not found, suggest similar names
         else:
