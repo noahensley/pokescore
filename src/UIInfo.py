@@ -253,11 +253,14 @@ class UIInfo (object):
             f"{self.result_info['Charged Move 2']}")
 
         if self.do_show_all_ranks.get():
-            result_text += "\nOther leagues:"
-            for league in self.result_info['Other Leagues']:
-                cur_rank = self.result_info['Other Leagues'][league][0][0]
-                cur_score = self.result_info['Other Leagues'][league][0][1]
-                result_text += f"\n{league} League: Rank #{cur_rank} (Score: {cur_score})"
+            if self.result_info['Other Leagues']:
+                result_text += "\nOther leagues:"
+                for league in self.result_info['Other Leagues']:
+                    cur_rank = self.result_info['Other Leagues'][league][0][0]
+                    cur_score = self.result_info['Other Leagues'][league][0][1]
+                    result_text += f"\n{league} League: Rank #{cur_rank} (Score: {cur_score})"
+            else:
+                result_text += f"\n{self.result_info['Name']} not found in any other leagues."
 
         self.result_label.config(text=result_text)
 
