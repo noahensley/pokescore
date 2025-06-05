@@ -127,7 +127,7 @@ class UIInfo (object):
                     {'Fast': m_fast, 'Charged1': m_charged1, 'Charged2': m_charged2}
                 )
 
-        # If Pokémon was found
+        # If Pokémon was found, determine best league and remove it from 'Other Leagues'
         if self.compare_rankings(supplied_name):       
             # Display 'other leagues' checkbox
             self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
@@ -248,17 +248,23 @@ class UIInfo (object):
         f"with a score of {self.result_info['Score']} in the {self.result_info['League']} League.")
         
         if self.do_show_moveset.get():
-            result_text += (f"\nBest moveset: {self.result_info['Fast Move']}, "
-            f"{self.result_info['Charged Move 1']}, "
-            f"{self.result_info['Charged Move 2']}")
+            best_moveset = self.result_info['Best Moveset']
+            result_text += (f"\nBest moveset: {best_moveset['Fast']}, {best_moveset['Charged1']}, "
+                            f"{best_moveset['Charged2']}")
 
         if self.do_show_all_ranks.get():
             if self.result_info['Other Leagues']:
+                other_leagues = self.result_info['Other Leagues']
                 result_text += "\nOther leagues:"
-                for league in self.result_info['Other Leagues']:
-                    cur_rank = self.result_info['Other Leagues'][league][0][0]
-                    cur_score = self.result_info['Other Leagues'][league][0][1]
+                for league in other_leagues:
+                    cur_rank = other_leagues[league][0][0]
+                    cur_score = other_leagues[league][0][1]
                     result_text += f"\n{league} League: Rank #{cur_rank} (Score: {cur_score})"
+                    # Add current league best moveset (if different from best league moveset)
+                    if self.do_show_moveset.get() and other_leagues[league][1] != self.result_info['Best Moveset']:
+                        result_text += (f" ({other_leagues[league][1]['Fast']}, "
+                        f"{other_leagues[league][1]['Charged1']}, "
+                        f"{other_leagues[league][1]['Charged2']})")
             else:
                 result_text += f"\n{self.result_info['Name']} not found in any other leagues."
 
@@ -281,9 +287,10 @@ class UIInfo (object):
         self.result_info['Name'] = query_name.capitalize() # This is needed even if not found
         if best_league:
             best_moveset = all_leagues[best_league][1]
-            self.result_info['Fast Move'] = best_moveset['Fast']
-            self.result_info['Charged Move 1'] = best_moveset['Charged1']
-            self.result_info['Charged Move 2'] = best_moveset['Charged2']
+            self.result_info['Best Moveset'] = {}
+            self.result_info['Best Moveset']['Fast'] = best_moveset['Fast']
+            self.result_info['Best Moveset']['Charged1'] = best_moveset['Charged1']
+            self.result_info['Best Moveset']['Charged2'] = best_moveset['Charged2']
             self.result_info['Rank'] = best_rank
             self.result_info['Score'] = best_score
             self.result_info['League'] = best_league.capitalize()
