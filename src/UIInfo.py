@@ -5,7 +5,6 @@ from tkinter import messagebox
 from WebUtils import initialize_fetch_csv
 import threading
 import queue
-import time
 import FileInfo
 import FileUtils
 import ClassifyUtils
@@ -13,11 +12,6 @@ import ClassifyUtils
 class UIInfo (object):
     
     def __init__(self):
-        """
-        Initialize the user interface for the Pokémon ranking search application.
-
-        :param data: The dataset containing Pokémon rankings.
-        """
 
         self.csv_data = FileUtils.load_data()
         self.suggestion_buttons = []
@@ -67,7 +61,7 @@ class UIInfo (object):
         self.do_show_all_ranks = tk.BooleanVar(value=False)
         self.show_all_ranks_checkbox = ttk.Checkbutton(
                         self.frame, 
-                        text="Show scores in other leagues", 
+                        text="Show scores in other leagues",
                         variable=self.do_show_all_ranks,
                         command=lambda: self.populate_result_label()
                     )
@@ -75,8 +69,8 @@ class UIInfo (object):
         # Logic/checkbox for displaying moveset (initially hidden)
         self.do_show_moveset = tk.BooleanVar(value=False)
         self.show_moveset_checkbox = ttk.Checkbutton(
-                        self.frame, 
-                        text="Show moveset", 
+                        self.frame,
+                        text="Show moveset",
                         variable=self.do_show_moveset,
                         command=lambda: self.populate_result_label()
                     )
@@ -90,16 +84,14 @@ class UIInfo (object):
         self.suggestions_frame = ttk.Frame(self.frame)
         self.suggestions_frame.grid(row=3, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
 
+        # Allow user to press 'Enter' to search
         self.root.bind('<Return>', lambda event: self.search_pokemon())
         self.root.mainloop()
 
 
     def search_pokemon(self):
         """
-        Search for a Pokémon in the dataset and display its ranking or suggestions.
-
-        :param data: The dataset containing Pokémon rankings.
-        :param ui_info: The UIInfo object containing references to UI elements.
+        Search for a Pokémon in the dataset and assign reults to 'result_info' attribute.
         """
         supplied_name = self.search_entry.get().strip().lower()
 
@@ -174,14 +166,11 @@ class UIInfo (object):
         self.search_entry.selection_range(0, tk.END)
 
 
-    def display_suggestions(self, pokemon_name, suggestions):
+    def display_suggestions(self, suggestions):
         """
-        Display the suggestions as clickable buttons under the result label.
+        Display suggested Pokémon as clickable buttons under the result label.
 
-        :param pokemon_name: The name of the Pokémon searched by the user.
         :param suggestions: List of suggested Pokémon names.
-        :param ui_info: The UIInfo object containing references to UI elements.
-        :param data: The data dictionary with league information.
         """
         # Clear any previous suggestion buttons
         self.suggestion_buttons.clear()
@@ -224,7 +213,7 @@ class UIInfo (object):
 
     def disable_close(self):
             """Disable the window's close (X) button."""
-            self.root.protocol("WM_DELETE_WINDOW", lambda: None)  # Ignore close button
+            self.root.protocol("WM_DELETE_WINDOW", lambda: None)  # Ignore close button presses
 
 
     def reenable_close(self):
