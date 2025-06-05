@@ -107,58 +107,34 @@ class UIInfo (object):
         self.show_moveset_checkbox.grid_remove()
 
         # Initialize classification variables
-        best_score = float('-inf')
-        best_rank = float('inf')
-        best_league = None
-        rank_scores = []  # Holds scores from all leagues
-        result = None
+        self.result_info['Other Leagues'] = {}
+        search_result_data = None
 
         # Search for the Pokémon in all leagues
         for league_name, league_data in self.csv_data.items():
-            result = league_data[league_data['Pokemon'].str.lower() == supplied_name]
-            if not result.empty:
-                score = result.at[result.index[0], 'Score']
-                rank = result.index[0] + 1
+            search_result_data = league_data[league_data['Pokemon'].str.lower() == supplied_name]
+            if not search_result_data.empty:
+                cur_index = search_result_data.index[0]
+                score = search_result_data.at[cur_index, 'Score']
+                rank = cur_index + 1 # Use row/index to calculate rank
 
-                # Store other rankings for later use
-                rank_scores.append(f"{league_name.capitalize()} League: Rank #{rank} (Score: {score})")
-
-                # Track best ranking
-                if rank < best_rank:
-                    best_rank = rank
-                    best_score = score
-                    best_league = league_name
-
-                    # NOTE: This assignment assumes the moves do not change among leagues.
-                    self.result_info['Fast Move'] = result.at[result.index[0], 'Fast Move']
-                    self.result_info['Charged Move 1'] = result.at[result.index[0], 'Charged Move 1']
-                    self.result_info['Charged Move 2'] = result.at[result.index[0], 'Charged Move 2']
+                # Store current league information
+                m_fast = search_result_data.at[cur_index, 'Fast Move']
+                m_charged1 = search_result_data.at[cur_index, 'Charged Move 1']
+                m_charged2 = search_result_data.at[cur_index, 'Charged Move 2']
+                self.result_info['Other Leagues'][league_name.capitalize()] = (
+                    (rank, score), 
+                    {'Fast': m_fast, 'Charged1': m_charged1, 'Charged2': m_charged2}
+                )
 
         # If Pokémon was found
-        self.result_info['Name'] = supplied_name.capitalize()
-        if best_league:   
-            # Remove best_league from rank_scores list
-            rank_scores = [entry for entry in rank_scores if not entry.startswith(f"{best_league.capitalize()} League")]
-
-            # Sort remaining leagues by highest rank (lowest rank number first)
-            rank_scores.sort(key=lambda entry: int(entry.split("#")[1].split()[0]))
-
-            # Add the search result info
-            self.result_info['Rank'] = best_rank
-            self.result_info['Score'] = best_score
-            self.result_info['League'] = best_league.capitalize()
-
-            self.result_info['Other Leagues'] = "\n".join(rank_scores)
-            self.result_info['Found'] = True
-
+        if self.compare_rankings(supplied_name):       
             # Display 'other leagues' checkbox
             self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
             # Display 'moveset' checkbox
             self.show_moveset_checkbox.grid(row=3, column=0, columnspan=3, pady=5, sticky=tk.W)
-
-        else:
-            self.result_info['Found'] = False
         
+        # Display results or display suggestions
         self.populate_result_label()
 
         # Focus and select all text in the search entry
@@ -263,7 +239,7 @@ class UIInfo (object):
         if not self.result_info['Found']:
             suggestions = ClassifyUtils.suggest_similar_names(self.result_info['Name'], self.csv_data)
             if suggestions:
-                self.display_suggestions(self.result_info['Name'], suggestions)
+                self.display_suggestions(suggestions)
             else:
                 self.result_label.config(text=f"{self.result_info['Name']} not found in any league.")
             return
@@ -277,6 +253,49 @@ class UIInfo (object):
             f"{self.result_info['Charged Move 2']}")
 
         if self.do_show_all_ranks.get():
-            result_text += f"\n\nOther leagues:\n{self.result_info['Other Leagues']}"
+            result_text += "\nOther leagues:"
+            for league in self.result_info['Other Leagues']:
+                cur_rank = self.result_info['Other Leagues'][league][0][0]
+                cur_score = self.result_info['Other Leagues'][league][0][1]
+                result_text += f"\n{league} League: Rank #{cur_rank} (Score: {cur_score})"
 
         self.result_label.config(text=result_text)
+
+
+    def compare_rankings(self, query_name):
+        best_rank = float('inf')
+        best_score = float('-inf')
+        best_league = None
+        all_leagues = self.result_info['Other Leagues']
+        for league in all_leagues.keys():
+            cur_rank = all_leagues[league][0][0]
+            cur_score = all_leagues[league][0][1]
+            if cur_rank <= best_rank and cur_score > best_score:
+                best_rank = cur_rank
+                best_score = cur_score
+                best_league = league
+
+        self.result_info['Name'] = query_name.capitalize() # This is needed even if not found
+        if best_league:
+            best_moveset = all_leagues[best_league][1]
+            self.result_info['Fast Move'] = best_moveset['Fast']
+            self.result_info['Charged Move 1'] = best_moveset['Charged1']
+            self.result_info['Charged Move 2'] = best_moveset['Charged2']
+            self.result_info['Rank'] = best_rank
+            self.result_info['Score'] = best_score
+            self.result_info['League'] = best_league.capitalize()
+            other_leagues = all_leagues.copy()
+            del other_leagues[best_league]
+            other_leagues_sorted = dict(sorted(
+                other_leagues.items(),
+                key=lambda item: item[1][0][1],
+                reverse=True
+            ))
+            self.result_info['Other Leagues'] = other_leagues_sorted
+            self.result_info['Found'] = True
+            return True
+        else:
+            self.result_info['Found'] = False
+            return False
+
+
