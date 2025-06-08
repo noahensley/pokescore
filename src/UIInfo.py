@@ -296,6 +296,7 @@ class UIInfo (object):
             self.result_info['League'] = best_league.capitalize()
             other_leagues = all_leagues.copy()
             del other_leagues[best_league]
+            # Sort other leagues by descending score
             other_leagues_sorted = dict(sorted(
                 other_leagues.items(),
                 key=lambda item: item[1][0][1],
