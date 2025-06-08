@@ -55,7 +55,7 @@ class WebInfo (object):
         try:        
             self.driver.set_page_load_timeout(10)
             self.driver.get("https://goiv.app/")
-            time.sleep(2)
+            time.sleep(0.5)
 
         except Exception as e:
             print(f"Error loading page: {e}")
