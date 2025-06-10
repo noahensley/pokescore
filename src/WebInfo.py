@@ -1,11 +1,9 @@
 from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
-import time
 
 
 class WebInfo (object):
@@ -21,7 +19,7 @@ class WebInfo (object):
         try:
             # Initialize webdriver
             self.chrome_options = Options()
-            #self.chrome_options.add_argument("--headless=new")
+            self.chrome_options.add_argument("--headless=new")
             self.chrome_options.add_argument("--disable-usb-discovery")
             self.chrome_options.add_argument("--disable-device-discovery-notifications")
             self.chrome_options.add_experimental_option("prefs", {
