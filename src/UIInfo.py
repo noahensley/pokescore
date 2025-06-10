@@ -8,6 +8,9 @@ import queue
 import FileInfo
 import FileUtils
 import ClassifyUtils
+import WebInfo
+import re
+from utils import core
 
 class UIInfo (object):
     
@@ -17,48 +20,38 @@ class UIInfo (object):
         self.suggestion_buttons = []
         self.except_queue = queue.Queue()
         self.result_info = {}
+        self.iv_info = WebInfo.WebInfo()
 
+        # ROOT
         self.root = tk.Tk()
         self.root.title("Go Battle League Pokémon Ranking")
         self.root.geometry("600x500")
         self.root.columnconfigure(0, weight=1)
         self.root.rowconfigure(0, weight=1)
 
+        # INIT
+        # Frames
         self.frame = ttk.Frame(self.root, padding="10")
-        self.frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        self.frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame)
-        self.frame.grid_columnconfigure(1, weight=1)  # Search entry should expand
-        self.frame.grid_columnconfigure(2, weight=0)  # Right-side elements (buttons)
-        self.frame.grid_rowconfigure(99, weight=1)  # Push bottom_frame to the bottom
-
         self.download_frame = ttk.Frame(self.frame)
-        self.download_frame.grid(row=99, column=0, columnspan=2, sticky=tk.SW)
-
+        self.suggestions_frame = ttk.Frame(self.frame)
+        # Labels
         self.search_label = ttk.Label(self.frame, text="Enter Pokémon Name:")
-        self.search_label.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W)
-
-        self.download_label = ttk.Label(self.frame, text="", foreground="blue")
-        self.download_label.grid(row=0, column=0, padx=0, pady=0, sticky=tk.W)
-
-        self.search_entry = ttk.Entry(self.frame, width=50)
-        self.search_entry.grid(row=0, column=1, padx=5, pady=5, sticky=(tk.W, tk.E))
-        self.search_entry.focus_set()
-
-        self.search_button = ttk.Button(self.frame, text="Search", command=lambda: self.search_pokemon())
-        self.search_button.grid(row=0, column=2, padx=5, pady=5)
-
+        self.iv_label = ttk.Label(self.frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray")
+        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue")
         self.result_label = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W)
-        self.result_label.grid(row=1, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
-
-        self.download_assets_button = ttk.Button(self.download_frame, text="Download Assets")
-        self.download_assets_button.grid(row=0, column=0, padx=0, pady=0, sticky=tk.W)
-        self.download_assets_button.config(command=lambda: self.download_assets())
-
         self.download_label = ttk.Label(self.download_frame, text="", foreground="blue")
-        self.download_label.grid(row=0, column=1, padx=5, pady=1, sticky=tk.W)
-
-        # Logic/checkbox for displaying other league scores (initially hidden)
-        self.do_show_all_ranks = tk.BooleanVar(value=False)
+        # Entries
+        self.search_entry = ttk.Entry(self.frame, width=25)
+        self.iv_entry = ttk.Entry(self.frame, width=10)
+        # Buttons
+        self.search_button = ttk.Button(self.frame, text="Search", command=lambda: self.search_pokemon())
+        self.iv_lookup_button = ttk.Button(self.frame, text="Lookup", command=lambda: self.assign_web_info())
+        self.download_assets_button = ttk.Button(self.download_frame, text="Download Assets", 
+                                                 command=lambda: self.download_assets())
+        # BooleanVar
+        self.do_show_all_ranks = tk.BooleanVar(value=False) # Initially unchecked
+        self.do_show_moveset = tk.BooleanVar(value=False) # Initially unchecked
+        # Checkbuttons
         self.show_all_ranks_checkbox = ttk.Checkbutton(
                         self.frame, 
                         text="Show scores in other leagues",
@@ -66,8 +59,6 @@ class UIInfo (object):
                         command=lambda: self.populate_result_label()
                     )
         
-        # Logic/checkbox for displaying moveset (initially hidden)
-        self.do_show_moveset = tk.BooleanVar(value=False)
         self.show_moveset_checkbox = ttk.Checkbutton(
                         self.frame,
                         text="Show moveset",
@@ -75,14 +66,43 @@ class UIInfo (object):
                         command=lambda: self.populate_result_label()
                     )
         
-        self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
-        self.show_all_ranks_checkbox.grid_remove()  # Hide initially
-        self.show_moveset_checkbox.grid(row=3, column=0, columnspan=3, pady=5, stick=tk.W)
-        self.show_moveset_checkbox.grid_remove()
+        # CONFIG
+        # Frames
+        self.frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame)
+        self.frame.grid_columnconfigure(1, weight=1)  # Search entry should expand
+        self.frame.grid_rowconfigure(2, weight=0) # Row for checkbuttons
+        self.frame.grid_rowconfigure(3, weight=0) # Row for results
+        self.frame.grid_rowconfigure(99, weight=1)  # Push bottom_frame to the bottom
+        # Buttons
+        self.iv_lookup_button.config(state=tk.DISABLED) # Disable before pokemon is searched
+        # Entries
+        self.iv_entry.config(state=tk.DISABLED) # Disable before pokemon is searched
 
-        # Frame for displaying suggestions
-        self.suggestions_frame = ttk.Frame(self.frame)
-        self.suggestions_frame.grid(row=3, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+        # GRID
+        # Frames
+        self.frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.suggestions_frame.grid(row=4, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+        self.download_frame.grid(row=99, column=0, columnspan=2, sticky=tk.SW)
+        # Labels
+        self.search_label.grid(row=0, column=0, padx=1, pady=0, sticky=tk.W)
+        self.iv_label.grid(row=1, column=0, padx=1, pady=0, sticky=tk.W)
+        self.iv_lookup_status_label.grid(row=1, column=1, padx=69, sticky=tk.W)
+        self.download_label.grid(row=0, column=1, padx=0, pady=0, sticky=tk.W) # row 0 of download_frame
+        self.result_label.grid(row=3, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
+        # Entries
+        self.search_entry.grid(row=0, column=1, padx=1, pady=0, sticky=tk.W)
+        self.iv_entry.grid(row=1, column=1, padx=1, pady=0, sticky=tk.W)
+        # Buttons
+        self.search_button.grid(row=0, column=2, sticky=tk.W)
+        self.iv_lookup_button.grid(row=1, column=2, sticky=tk.W)
+        self.download_assets_button.grid(row=0, column=0, padx=0, pady=0, sticky=tk.W) # row 0 of download_frame
+        # Checkbuttons
+        self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=2, pady=1, sticky=tk.W)
+        self.show_moveset_checkbox.grid(row=2, column=1, columnspan=1, padx=50, pady=1, sticky=tk.W) # padx to not overlap
+        
+        self.search_entry.focus_set() # Focus the search bar      
+        self.show_all_ranks_checkbox.grid_remove()  # Hide initially     
+        self.show_moveset_checkbox.grid_remove() # Hide initially
 
         # Allow user to press 'Enter' to search
         self.root.bind('<Return>', lambda event: self.search_pokemon())
@@ -130,9 +150,9 @@ class UIInfo (object):
         # If Pokémon was found, determine best league and remove it from 'Other Leagues'
         if self.compare_rankings(supplied_name):       
             # Display 'other leagues' checkbox
-            self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=3, pady=5, sticky=tk.W)
+            self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=2, pady=5, sticky=tk.W)
             # Display 'moveset' checkbox
-            self.show_moveset_checkbox.grid(row=3, column=0, columnspan=3, pady=5, sticky=tk.W)
+            self.show_moveset_checkbox.grid(row=2, column=1, columnspan=1, pady=5, sticky=tk.W)
         
         # Display results or display suggestions
         self.populate_result_label()
@@ -140,6 +160,44 @@ class UIInfo (object):
         # Focus and select all text in the search entry
         self.search_entry.focus_set()
         self.search_entry.selection_range(0, tk.END)
+
+        # Enable IV Lookup
+        self.iv_entry.config(state=tk.NORMAL)
+        self.iv_lookup_button.config(state=tk.NORMAL)
+        self.iv_label.config(foreground="")
+
+
+    def assign_web_info(self):
+        name = self.search_entry.get().strip().lower()
+        ivs = self.iv_entry.get().strip().lower()
+        
+        match = re.search(core.iv_pattern, ivs)
+
+        if not match:
+            self.iv_lookup_status_label.config(text="Invalid IV Format.", foreground="red2")
+            self.iv_entry.focus_set()
+            self.iv_entry.selection_range(0, tk.END)
+            return
+
+        if name == "":
+            self.iv_lookup_status_label.config(text="Please enter a Pokemon name.", foreground="red2")
+            self.search_entry.focus_set()
+            return
+
+        ivs = [item.strip() for item in ivs.split(",")]
+
+        self.iv_info.pokemon_name = name.capitalize()
+        self.iv_info.attack_iv = ivs[0]
+        self.iv_info.defense_iv = ivs[1]
+        self.iv_info.stamina_iv = ivs[2]
+
+        if self.iv_info.fetch_ivs() == False:
+            self.iv_lookup_status_label.config(text="Could not find Pokemon.", foreground="red2")
+            self.search_entry.focus_set()
+            self.iv_entry.selection_range(0, tk.END)
+            return
+        
+        self.populate_iv_info()
 
 
     def display_suggestions(self, suggestions):
@@ -161,7 +219,7 @@ class UIInfo (object):
                 text=name,
                 command=lambda n=name: self.search_entry.delete(0, tk.END) or self.search_entry.insert(0, n) or self.search_pokemon()
             )
-            button.grid(row=idx + 2, column=0, columnspan=3, pady=5, sticky=tk.EW)  # Adjust positioning
+            button.grid(row=idx + 4, column=0, columnspan=3, pady=5, sticky=tk.EW)  # +4 so they are below the text
             self.suggestion_buttons.append(button)  # Track the button
 
 
@@ -174,7 +232,9 @@ class UIInfo (object):
     def disable_ui(self):
         """Disable UI elements during download."""
         self.search_entry.config(state=tk.DISABLED)
+        self.iv_entry.config(state=tk.DISABLED)
         self.search_button.config(state=tk.DISABLED)
+        self.iv_lookup_button.config(state=tk.DISABLED)
         self.download_assets_button.config(state=tk.DISABLED)
         self.disable_close()  # Disable close button
 
@@ -182,7 +242,9 @@ class UIInfo (object):
     def reenable_ui(self):
         """Re-enable UI elements after download."""
         self.search_entry.config(state=tk.NORMAL)
+        self.iv_entry.config(state=tk.NORMAL)
         self.search_button.config(state=tk.NORMAL)
+        self.iv_lookup_button.config(state=tk.NORMAL)
         self.download_assets_button.config(state=tk.NORMAL)
         self.reenable_close()  # Restore close button
 
@@ -210,7 +272,7 @@ class UIInfo (object):
                 while not self.except_queue.empty():
                     ecode = self.except_queue.get()
                     if ecode != None:
-                        self.download_label.config(text=f"Download failed.", foreground="red")
+                        self.download_label.config(text=f"Download failed.", foreground="red2")
                         file_info.restore_data_backup()
                         return
 
@@ -219,7 +281,7 @@ class UIInfo (object):
                 file_info.discard_backup()
 
             except Exception as e:
-                self.download_label.config(text=f"Error: {e}", foreground="red")
+                self.download_label.config(text=f"Error: {e}", foreground="red2")
             finally:
                 self.reenable_ui()
 
@@ -308,5 +370,18 @@ class UIInfo (object):
         else:
             self.result_info['Found'] = False
             return False
+        
+
+    def populate_iv_info(self):
+        result = self.result_label.cget("text")
+        result += "\n"
+
+        ordered_ranks = dict(sorted(self.iv_info.ranks.items(), key=lambda item: item[1]))
+
+        for key in ordered_ranks:
+            result += f"{key}: {self.iv_info.stringify_ivs()} => {ordered_ranks[key]}\n"
+
+        self.result_label.config(text=result)
+        
 
 

@@ -10,18 +10,18 @@ import time
 
 class WebInfo (object):
     
-    def __init__(self, name, ivs=[0,0,0]):
-        if type(name) != str:
+    def __init__(self, name=None, ivs=None):
+        if type(name) != str and name != None:
             raise RuntimeError("Input name must be a string.")
-        if type(ivs) != list:
+        if type(ivs) != list and ivs != None:
             raise RuntimeError("Input IVs must be a list.")
-        if len(ivs) != 3:
+        if ivs != None and len(ivs) != 3:
             raise RuntimeError("Must provide three IV fields.")
         
         try:
             # Initialize webdriver
             self.chrome_options = Options()
-            #chrome_options.add_argument("--headless=new")
+            #self.chrome_options.add_argument("--headless=new")
             self.chrome_options.add_argument("--disable-usb-discovery")
             self.chrome_options.add_argument("--disable-device-discovery-notifications")
             self.chrome_options.add_experimental_option("prefs", {
@@ -36,12 +36,15 @@ class WebInfo (object):
             self.driver = webdriver.Chrome(options=self.chrome_options)
             self.wait = WebDriverWait(self.driver, 10)
             self.pokemon_name = name
-            self.attack_iv = ivs[0]
-            self.defense_iv = ivs[1]
-            self.stamina_iv = ivs[2]
-            self.great_league_rank = None
-            self.ultra_league_rank = None
-            self.master_league_rank = None
+            if ivs != None:
+                self.attack_iv = ivs[0]
+                self.defense_iv = ivs[1]
+                self.stamina_iv = ivs[2]
+            else:
+                self.attack_iv = None
+                self.defense_iv = None
+                self.stamina_iv = None
+            self.ranks = {}
 
         except Exception as e:
             print(f"Unexpected error: {e}")
@@ -64,7 +67,9 @@ class WebInfo (object):
         if self.enter_pokemon_name():
             self.enter_pokemon_ivs()
             self.collect_iv_rankings()
-            # compare rankings and return the data to the UI
+            return True
+        else:
+            return False
     
 
     def enter_pokemon_name(self):
@@ -105,14 +110,18 @@ class WebInfo (object):
         # Every pokemon should always have a rank
         great_league_top_row = self.driver.find_element(By.XPATH, 
             '//*[@id="__next"]/section/main/section[2]/div[1]/div/section/table/tbody/tr[1]/td[1]')
-        self.great_league_rank = great_league_top_row.text
+        self.ranks['Great League'] = great_league_top_row.text
 
         ultra_league_top_row = self.driver.find_element(By.XPATH, 
             '//*[@id="__next"]/section/main/section[2]/div[2]/div/section/table/tbody/tr[1]/td[1]')
-        self.ultra_league_rank = ultra_league_top_row.text
+        self.ranks['Ultra League'] = ultra_league_top_row.text
 
         master_league_top_row = self.driver.find_element(By.XPATH, 
             '//*[@id="__next"]/section/main/section[2]/div[3]/div/section/table/tbody/tr[1]/td[1]')
-        self.master_league_rank = master_league_top_row.text
+        self.ranks['Master League'] = master_league_top_row.text
 
         #print(self.great_league_rank, self.ultra_league_rank, self.master_league_rank)
+
+
+    def stringify_ivs(self):
+        return self.attack_iv + ", " + self.defense_iv + ", " + self.stamina_iv

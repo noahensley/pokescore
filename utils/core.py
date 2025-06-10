@@ -4,4 +4,5 @@ urls = {
     "master": "https://pvpoke.com/rankings/all/10000/overall/"
     }
 
-pattern = r"https://pvpoke\.com/rankings/all/(\d{4,5})/overall/"
+url_pattern = r"https://pvpoke\.com/rankings/all/(\d{4,5})/overall/"
+iv_pattern = r"^(?:1[0-5]|[0-9]),(?:1[0-5]|[0-9]),(?:1[0-5]|[0-9])$"

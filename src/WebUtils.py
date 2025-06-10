@@ -43,7 +43,7 @@ def fetch_csv(q, src, dst):
     if type(src) != str:
         raise TypeError("Input URL must be a string.")
     
-    match = re.search(core.pattern, src)
+    match = re.search(core.url_pattern, src)
 
     if not match:
         raise RuntimeError("Unsupported URL format.")
