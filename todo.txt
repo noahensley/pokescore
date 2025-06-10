@@ -1,0 +1,5 @@
+1. Threads return OK when download fails.  This is because the threads simply start the download, not ensure the files appear.
+2. Add forms information allowing the user to "see different evos"
+3. Remove '(Shadow)' extension when doing an IV lookup
+4. Search button should clear IV entry box
+5. Make 'Enter' work for both 'Search'/'Lookup' depending on which entry is focused
