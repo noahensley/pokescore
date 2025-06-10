@@ -119,8 +119,6 @@ class WebInfo (object):
             '//*[@id="__next"]/section/main/section[2]/div[3]/div/section/table/tbody/tr[1]/td[1]')
         self.ranks['Master League'] = master_league_top_row.text
 
-        #print(self.great_league_rank, self.ultra_league_rank, self.master_league_rank)
-
 
     def stringify_ivs(self):
         return self.attack_iv + ", " + self.defense_iv + ", " + self.stamina_iv

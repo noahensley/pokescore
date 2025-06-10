@@ -20,6 +20,7 @@ class UIInfo (object):
         self.suggestion_buttons = []
         self.except_queue = queue.Queue()
         self.result_info = {}
+        self.iv_rankings = {}
         self.iv_info = WebInfo.WebInfo()
 
         # ROOT
@@ -197,7 +198,10 @@ class UIInfo (object):
             self.iv_entry.selection_range(0, tk.END)
             return
         
-        self.populate_iv_info()
+        self.iv_lookup_status_label.config(text="Success", foreground="blue")
+        # Copy the results to the UIInfo in ascending order
+        self.iv_rankings = dict(sorted(self.iv_info.ranks.items(), key=lambda item: int(item[1])))
+        self.populate_result_label()
 
 
     def display_suggestions(self, suggestions):
@@ -330,6 +334,11 @@ class UIInfo (object):
             else:
                 result_text += f"\n{self.result_info['Name']} not found in any other leagues."
 
+        if self.iv_rankings:
+            result_text += f"\nIV Rankings:\n"
+            for league in self.iv_rankings:
+                result_text += f"{league}: {self.iv_info.stringify_ivs()} => #{self.iv_rankings[league]}\n"
+
         self.result_label.config(text=result_text)
 
 
@@ -370,18 +379,6 @@ class UIInfo (object):
         else:
             self.result_info['Found'] = False
             return False
-        
-
-    def populate_iv_info(self):
-        result = self.result_label.cget("text")
-        result += "\n"
-
-        ordered_ranks = dict(sorted(self.iv_info.ranks.items(), key=lambda item: item[1]))
-
-        for key in ordered_ranks:
-            result += f"{key}: {self.iv_info.stringify_ivs()} => {ordered_ranks[key]}\n"
-
-        self.result_label.config(text=result)
         
 
 
