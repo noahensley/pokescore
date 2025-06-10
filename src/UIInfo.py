@@ -166,6 +166,7 @@ class UIInfo (object):
         self.iv_entry.config(state=tk.NORMAL)
         self.iv_lookup_button.config(state=tk.NORMAL)
         self.iv_label.config(foreground="")
+        self.iv_lookup_status_label.config(text="") # Clear Success code
 
 
     def assign_web_info(self):
@@ -340,6 +341,7 @@ class UIInfo (object):
                 result_text += f"{league}: {self.iv_info.stringify_ivs()} => #{self.iv_rankings[league]}\n"
 
         self.result_label.config(text=result_text)
+        self.iv_rankings = {} # Reset IV info on new search
 
 
     def compare_rankings(self, query_name):
