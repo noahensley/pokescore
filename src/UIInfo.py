@@ -352,7 +352,11 @@ class UIInfo (object):
         for league in all_leagues.keys():
             cur_rank = all_leagues[league][0][0]
             cur_score = all_leagues[league][0][1]
-            if cur_rank <= best_rank and cur_score > best_score:
+            if cur_rank < best_rank:
+                best_rank = cur_rank
+                best_score = cur_score
+                best_league = league
+            elif cur_rank == best_rank and cur_score > best_score:
                 best_rank = cur_rank
                 best_score = cur_score
                 best_league = league
