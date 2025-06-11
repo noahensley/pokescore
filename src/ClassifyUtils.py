@@ -86,7 +86,3 @@ def suggest_similar_names(pokemon_name, data):
     # Sort the suggestions prioritizing the initial of the supplied_name
     sorted_suggestions = sorted(suggestions, key=lambda x: (x[0].lower() != pokemon_name[0].lower(), x))
     return sorted_suggestions[:4]
-
-
-
-

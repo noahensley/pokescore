@@ -106,7 +106,7 @@ class UIInfo (object):
         self.show_moveset_checkbox.grid_remove() # Hide initially
 
         # Allow user to press 'Enter' to search
-        self.root.bind('<Return>', lambda event: self.search_pokemon())
+        self.root.bind('<Return>', self.handle_enter_press)
         self.root.mainloop()
 
 
@@ -208,6 +208,10 @@ class UIInfo (object):
         # Copy the results to the UIInfo in ascending order
         self.iv_rankings = dict(sorted(self.iv_info.ranks.items(), key=lambda item: int(item[1])))
         self.populate_result_label()
+
+        # Highlight IV entry selection
+        self.iv_entry.focus_set()
+        self.iv_entry.selection_range(0, tk.END)
 
 
     def display_suggestions(self, suggestions):
@@ -391,5 +395,13 @@ class UIInfo (object):
             self.result_info['Found'] = False
             return False
         
+
+    def handle_enter_press(self, event):
+        focused = event.widget.focus_get()
+        if focused == self.search_entry:
+            self.search_pokemon()
+        elif focused == self.iv_entry:
+            self.assign_web_info()
+
 
 
