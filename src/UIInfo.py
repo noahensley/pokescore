@@ -112,7 +112,7 @@ class UIInfo (object):
 
     def search_pokemon(self):
         """
-        Search for a Pokémon in the dataset and assign reults to 'result_info' attribute.
+        Search for a Pokémon in the dataset and assign results to 'result_info' attribute.
         """
         supplied_name = self.search_entry.get().strip().lower()
 
@@ -173,7 +173,7 @@ class UIInfo (object):
     def assign_web_info(self):
         name = self.search_entry.get().strip().lower()
         ivs = self.iv_entry.get().strip().lower()
-        name = self.handle_shadow_ext(name)
+        name = self.remove_shadow_ext(name)
         
         match = re.search(core.iv_pattern, ivs)
 
@@ -190,7 +190,7 @@ class UIInfo (object):
 
         ivs = [item.strip() for item in ivs.split(",")]
 
-        if ivs == [self.iv_info.attack_iv, self.iv_info.defense_iv, self.iv_info.stamina_iv]:
+        if ivs == [self.iv_info.attack_iv, self.iv_info.defense_iv, self.iv_info.stamina_iv] and name == self.iv_info.pokemon_name:
             self.iv_lookup_status_label.config(text="IVs already displayed.", foreground="blue")
             return
 
@@ -371,7 +371,8 @@ class UIInfo (object):
                 best_score = cur_score
                 best_league = league
 
-        self.result_info['Name'] = query_name.capitalize() # This is needed even if not found
+        query_name = self.handle_name_ext(query_name.capitalize())
+        self.result_info['Name'] = query_name # This is needed even if not found
         if best_league:
             best_moveset = all_leagues[best_league][1]
             self.result_info['Best Moveset'] = {}
@@ -405,7 +406,7 @@ class UIInfo (object):
             self.assign_web_info()
 
 
-    def handle_shadow_ext(self, name):
+    def remove_shadow_ext(self, name):
         if type(name) != str:
             raise RuntimeError("Input name must be a string.")
         
@@ -414,5 +415,30 @@ class UIInfo (object):
             return name[:index]
         
         return name
+    
+
+    def handle_name_ext(self, name):
+        """
+        Takes a lower case name and ensures any "()" tags are capitalized.
+        """
+
+        indices = []
+        cur_index = 0
+        while True:
+            cur_index = name.find("(", cur_index, len(name)-1)
+            if cur_index == -1:
+                break
+            cur_index += 1
+            if cur_index < len(name):
+                indices.append(cur_index)
+
+        if len(indices) == 0:
+            return name
+
+        list_copy = list(name)
+        for i in indices:
+            list_copy[i] = list_copy[i].upper()
+
+        return "".join(list_copy)
 
 
