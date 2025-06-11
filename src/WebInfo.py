@@ -4,6 +4,7 @@ from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
+from selenium.webdriver.support.ui import Select
 
 
 class WebInfo (object):
@@ -19,7 +20,7 @@ class WebInfo (object):
         try:
             # Initialize webdriver
             self.chrome_options = Options()
-            self.chrome_options.add_argument("--headless=new")
+            #self.chrome_options.add_argument("--headless=new")
             self.chrome_options.add_argument("--disable-usb-discovery")
             self.chrome_options.add_argument("--disable-device-discovery-notifications")
             self.chrome_options.add_experimental_option("prefs", {
@@ -86,18 +87,14 @@ class WebInfo (object):
         return element != None
     
     def enter_pokemon_ivs(self):
-
         attack_select = self.driver.find_element(By.XPATH, '//*[@id="__next"]/section/main/section[1]/div[1]/label[1]/select')
-        attack_select.click()
-        attack_select.send_keys(self.attack_iv)
+        Select(attack_select).select_by_visible_text(str(self.attack_iv))
 
         defense_select = self.driver.find_element(By.XPATH, '//*[@id="__next"]/section/main/section[1]/div[1]/label[2]/select')
-        defense_select.click()
-        defense_select.send_keys(self.defense_iv)
+        Select(defense_select).select_by_visible_text(str(self.defense_iv))
 
         stamina_select = self.driver.find_element(By.XPATH, '//*[@id="__next"]/section/main/section[1]/div[1]/label[3]/select')
-        stamina_select.click()
-        stamina_select.send_keys(self.stamina_iv)
+        Select(stamina_select).select_by_visible_text(str(self.stamina_iv))
 
         body = self.driver.find_element(By.TAG_NAME, "body")
         body.click()
