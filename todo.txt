@@ -3,3 +3,4 @@
 3. Remove '(Shadow)' extension when doing an IV lookup
 4. Search button should clear IV entry box
 5. Make 'Enter' work for both 'Search'/'Lookup' depending on which entry is focused
+6. Have a check for 'Lookup' with the same IV rankings that are already displayed.
