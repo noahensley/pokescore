@@ -167,6 +167,7 @@ class UIInfo (object):
         self.iv_lookup_button.config(state=tk.NORMAL)
         self.iv_label.config(foreground="")
         self.iv_lookup_status_label.config(text="") # Clear Success code
+        self.iv_entry.delete(0, tk.END) # Clear IV input on new search
 
 
     def assign_web_info(self):
