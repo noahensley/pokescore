@@ -189,6 +189,10 @@ class UIInfo (object):
 
         ivs = [item.strip() for item in ivs.split(",")]
 
+        if ivs == [self.iv_info.attack_iv, self.iv_info.defense_iv, self.iv_info.stamina_iv]:
+            self.iv_lookup_status_label.config(text="IVs already displayed.", foreground="blue")
+            return
+
         self.iv_info.pokemon_name = name.capitalize()
         self.iv_info.attack_iv = ivs[0]
         self.iv_info.defense_iv = ivs[1]
