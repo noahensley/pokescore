@@ -1,2 +1,7 @@
 1. Threads return OK when download fails.  This is because the threads simply start the download, not ensure the files appear.
 2. Add forms information allowing the user to "see different evos"
+3. Unchecking the checkboxes removes IV info.  Fix that.
+4. Change some labels to text widgets where appropriate.
+5. Combine the search/lookup buttons into one.
+6. Add a handle_tab that swaps focus between the search and IV entries.
+7. Score preferred over rank.  Fix that. (e.g. Garchomp, Garchomp (Shadow))
