@@ -173,6 +173,7 @@ class UIInfo (object):
     def assign_web_info(self):
         name = self.search_entry.get().strip().lower()
         ivs = self.iv_entry.get().strip().lower()
+        name = self.handle_shadow_ext(name)
         
         match = re.search(core.iv_pattern, ivs)
 
@@ -403,5 +404,15 @@ class UIInfo (object):
         elif focused == self.iv_entry:
             self.assign_web_info()
 
+
+    def handle_shadow_ext(self, name):
+        if type(name) != str:
+            raise RuntimeError("Input name must be a string.")
+        
+        index = name.find(" (")
+        if index != -1:
+            return name[:index]
+        
+        return name
 
 

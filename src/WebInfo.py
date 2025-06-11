@@ -20,7 +20,7 @@ class WebInfo (object):
         try:
             # Initialize webdriver
             self.chrome_options = Options()
-            #self.chrome_options.add_argument("--headless=new")
+            self.chrome_options.add_argument("--headless=new")
             self.chrome_options.add_argument("--disable-usb-discovery")
             self.chrome_options.add_argument("--disable-device-discovery-notifications")
             self.chrome_options.add_experimental_option("prefs", {
@@ -85,6 +85,7 @@ class WebInfo (object):
             element = None
 
         return element != None
+    
     
     def enter_pokemon_ivs(self):
         attack_select = self.driver.find_element(By.XPATH, '//*[@id="__next"]/section/main/section[1]/div[1]/label[1]/select')
