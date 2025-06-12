@@ -2,4 +2,3 @@
 2. Add forms information allowing the user to "see different evos"
 3. Change some labels to text widgets where appropriate.
 4. Combine the search/lookup buttons into one.
-5. Add a handle_tab that swaps focus between the search and IV entries.
