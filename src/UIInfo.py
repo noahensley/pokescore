@@ -155,6 +155,7 @@ class UIInfo (object):
             # Display 'moveset' checkbox
             self.show_moveset_checkbox.grid(row=2, column=1, columnspan=1, pady=5, sticky=tk.W)
         
+        self.iv_rankings = {} # Reset IV info on new searchs
         # Display results or display suggestions
         self.populate_result_label()
 
@@ -351,7 +352,6 @@ class UIInfo (object):
                 result_text += f"{league}: {self.iv_info.stringify_ivs()} => #{self.iv_rankings[league]}\n"
 
         self.result_label.config(text=result_text)
-        self.iv_rankings = {} # Reset IV info on new search
 
 
     def compare_rankings(self, query_name):
