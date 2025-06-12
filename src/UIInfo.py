@@ -107,6 +107,7 @@ class UIInfo (object):
 
         # Allow user to press 'Enter' to search
         self.root.bind('<Return>', self.handle_enter_press)
+        self.root.bind('<Tab>', self.handle_tab_press)
         self.root.mainloop()
 
 
@@ -403,6 +404,21 @@ class UIInfo (object):
             self.search_pokemon()
         elif focused == self.iv_entry:
             self.assign_web_info()
+
+
+    def handle_tab_press(self, event):
+        focused = event.widget.focus_get()
+        if focused == self.search_entry:
+            if 'disabled' not in self.iv_entry.state():
+                self.iv_entry.focus_set()
+                self.iv_entry.selection_range(0, tk.END)
+        elif focused == self.iv_entry:
+            self.search_entry.focus_set()
+            self.search_entry.selection_range(0, tk.END)
+        else:
+            self.search_entry.focus_set()
+            self.search_entry.selection_range(0, tk.END)
+        return "break"
 
 
     def remove_shadow_ext(self, name):
