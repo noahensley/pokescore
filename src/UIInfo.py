@@ -384,11 +384,10 @@ class UIInfo (object):
             self.result_info['League'] = best_league.capitalize()
             other_leagues = all_leagues.copy()
             del other_leagues[best_league]
-            # Sort other leagues by descending score
+            # Sort other leagues by descending rank
             other_leagues_sorted = dict(sorted(
                 other_leagues.items(),
-                key=lambda item: item[1][0][1],
-                reverse=True
+                key=lambda item: item[1][0][0],
             ))
             self.result_info['Other Leagues'] = other_leagues_sorted
             self.result_info['Found'] = True
