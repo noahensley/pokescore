@@ -60,9 +60,8 @@ class FileInfo(object):
 
         downloaded_files = []
         for file in os.listdir(self.data_path):
-            if os.path.isfile(file):
-                if not file.endswith(".gitignore"):
-                    downloaded_files.append(file)
+            if file.endswith(".csv"):
+                downloaded_files.append(file)
 
         return sorted(target_files) == sorted(downloaded_files)
 

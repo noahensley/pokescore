@@ -24,7 +24,7 @@ def format_csv_filename(url):
     if type(url) != str:
         raise TypeError("Input URL must be a string.")
     
-    match = re.search(core.pattern, url)
+    match = re.search(core.url_pattern, url)
 
     if not match:
         raise RuntimeError("Unsupported URL format.")
@@ -60,14 +60,3 @@ def load_data():
     except FileNotFoundError as e:
         messagebox.showerror("File Not Found", f"Could not find file: {e.filename}")
         exit()
-
-
-def wait_for_download(url, dst, timeout=15):
-    start_time = time.time()
-    while time.time() - start_time < timeout:
-        if any(f == format_csv_filename(url) for f in os.listdir(dst)):
-            print("Download complete!")
-            return True
-        time.sleep(1)
-    print("Timeout: File not found.")
-    return False

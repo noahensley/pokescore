@@ -77,7 +77,7 @@ def fetch_csv(q, src, dst):
         export_hyperlink = wait.until(EC.element_to_be_clickable((By.LINK_TEXT, "Export to CSV")))
         export_hyperlink.click()
 
-        time.sleep(2) # Wait for download to complete
+        time.sleep(1) # Wait for download to complete (slower connections might need longer)
         q.put(None)
 
     except Exception as e:

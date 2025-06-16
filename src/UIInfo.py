@@ -1,4 +1,3 @@
-
 import tkinter as tk
 from tkinter import ttk
 from tkinter import messagebox
@@ -18,7 +17,7 @@ class UIInfo (object):
 
         self.csv_data = FileUtils.load_data()
         self.suggestion_buttons = []
-        self.except_queue = queue.Queue()
+        self.except_queue = queue.Queue(maxsize=3)
         self.result_info = {}
         self.iv_rankings = {}
         self.iv_info = WebInfo.WebInfo()
@@ -286,12 +285,23 @@ class UIInfo (object):
 
                 initialize_fetch_csv(self.except_queue, file_info)
 
+                # Wait for threads to finish
+                while not self.except_queue.full():
+                    pass
+
+                # Ensures threads did not fail
                 while not self.except_queue.empty():
                     ecode = self.except_queue.get()
                     if ecode != None:
                         self.download_label.config(text=f"Download failed.", foreground="red2")
                         file_info.restore_data_backup()
                         return
+
+                # Ensures required files are present
+                if not file_info.downloads_successful():
+                    self.download_label.config(text=f"Download failed.", foreground="red2")
+                    file_info.restore_data_backup()
+                    return
 
                 self.csv_data = FileUtils.load_data()
                 self.download_label.config(text=f"Download complete.")
