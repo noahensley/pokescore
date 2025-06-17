@@ -195,7 +195,7 @@ class UIInfo (object):
             self.iv_lookup_status_label.config(text="IVs already displayed.", foreground="blue")
             return
 
-        self.iv_info.pokemon_name = name.capitalize()
+        self.iv_info.pokemon_name = self.capitalize_name_ext(name)
         self.iv_info.attack_iv = ivs[0]
         self.iv_info.defense_iv = ivs[1]
         self.iv_info.stamina_iv = ivs[2]
@@ -382,7 +382,7 @@ class UIInfo (object):
                 best_score = cur_score
                 best_league = league
 
-        query_name = self.handle_name_ext(query_name.capitalize())
+        query_name = self.capitalize_name_ext(query_name)
         self.result_info['Name'] = query_name # This is needed even if not found
         if best_league:
             best_moveset = all_leagues[best_league][1]
@@ -435,17 +435,22 @@ class UIInfo (object):
         if type(name) != str:
             raise RuntimeError("Input name must be a string.")
         
-        index = name.find(" (")
+        lower_name = name.lower()
+        index = lower_name.find(" (shadow)")
         if index != -1:
             return name[:index]
         
         return name
     
 
-    def handle_name_ext(self, name):
+    def capitalize_name_ext(self, name):
         """
-        Takes a lower case name and ensures any "()" tags are capitalized.
+        Takes a lower case name and ensures any "()" tags are capitalized along
+        with the first letter.
         """
+
+        # Always capitalize first letter
+        name = name.capitalize()
 
         indices = []
         cur_index = 0
