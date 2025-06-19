@@ -2,3 +2,5 @@
 2. Add forms information allowing the user to "see different evos"
 3. Change some labels to text widgets where appropriate.
 4. Combine the search/lookup buttons into one.
+5. Look into Label textvariable param
+6. Format entry labels, result header, etc. using Label font, etc.
