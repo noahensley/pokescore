@@ -30,23 +30,35 @@ class UIInfo (object):
         self.root.rowconfigure(0, weight=1)
 
         # INIT
+        # Styles
+        ttk.Style().theme_use('clam')
+        ttk.Style().configure('LargeBold.TLabel', font=('Arial', 12, 'bold'))
+        ttk.Style().configure('Large.TLabel', font=('Arial', 12))
+        ttk.Style().configure('Small.TLabel', font=('Arial', 10))
+        ttk.Style().configure('Large.TCheckbutton', font=('Arial', 11))
+        button_style = ttk.Style()
+        button_style.configure('Large.TButton', font=('Arial', 12), foreground='white', background='#007bff')
+        button_style.map('Large.TButton', 
+                         background=[('active', '#0056b3')])
         # Frames
         self.frame = ttk.Frame(self.root, padding="10")
         self.download_frame = ttk.Frame(self.frame)
         self.suggestions_frame = ttk.Frame(self.frame)
         # Labels
-        self.search_label = ttk.Label(self.frame, text="Enter Pokémon Name:")
-        self.iv_label = ttk.Label(self.frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray")
-        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue")
-        self.result_label = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W)
-        self.download_label = ttk.Label(self.download_frame, text="", foreground="blue")
+        self.search_label = ttk.Label(self.frame, text="Enter Pokémon Name:", style='LargeBold.TLabel')
+        self.iv_label = ttk.Label(self.frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray", style='LargeBold.TLabel')
+        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue", style='LargeBold.TLabel')
+        self.result_label = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W, style='LargeBold.TLabel')
+        self.download_label = ttk.Label(self.download_frame, text="", foreground="blue", style='LargeBold.TLabel')
         # Entries
-        self.search_entry = ttk.Entry(self.frame, width=25)
-        self.iv_entry = ttk.Entry(self.frame, width=10)
+        self.search_entry = ttk.Entry(self.frame, width=25, font=('Arial', 12))
+        self.iv_entry = ttk.Entry(self.frame, width=10, font=('Arial', 12))
         # Buttons
-        self.search_button = ttk.Button(self.frame, text="Search", command=lambda: self.search_pokemon())
-        self.iv_lookup_button = ttk.Button(self.frame, text="Lookup", command=lambda: self.assign_web_info())
-        self.download_assets_button = ttk.Button(self.download_frame, text="Download Assets", 
+        self.search_button = ttk.Button(self.frame, text="Search", style='Large.TButton',
+                                        command=lambda: self.search_pokemon())
+        self.iv_lookup_button = ttk.Button(self.frame, text="Lookup", style='Large.TButton',
+                                           command=lambda: self.assign_web_info())
+        self.download_assets_button = ttk.Button(self.download_frame, text="Download Assets", style='Large.TButton',
                                                  command=lambda: self.download_assets())
         # BooleanVar
         self.do_show_all_ranks = tk.BooleanVar(value=False) # Initially unchecked
@@ -56,6 +68,7 @@ class UIInfo (object):
                         self.frame, 
                         text="Show scores in other leagues",
                         variable=self.do_show_all_ranks,
+                        style='Large.TCheckbutton',
                         command=lambda: self.populate_result_label()
                     )
         
@@ -63,6 +76,7 @@ class UIInfo (object):
                         self.frame,
                         text="Show moveset",
                         variable=self.do_show_moveset,
+                        style='Large.TCheckbutton',
                         command=lambda: self.populate_result_label()
                     )
         
@@ -86,12 +100,12 @@ class UIInfo (object):
         # Labels
         self.search_label.grid(row=0, column=0, padx=1, pady=0, sticky=tk.W)
         self.iv_label.grid(row=1, column=0, padx=1, pady=0, sticky=tk.W)
-        self.iv_lookup_status_label.grid(row=1, column=1, padx=69, sticky=tk.W)
-        self.download_label.grid(row=0, column=1, padx=0, pady=0, sticky=tk.W) # row 0 of download_frame
+        self.iv_lookup_status_label.grid(row=1, column=1, padx=100, sticky=tk.W)
+        self.download_label.grid(row=0, column=1, padx=3, pady=0, sticky=tk.W) # row 0 of download_frame
         self.result_label.grid(row=3, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
         # Entries
-        self.search_entry.grid(row=0, column=1, padx=1, pady=0, sticky=tk.W)
-        self.iv_entry.grid(row=1, column=1, padx=1, pady=0, sticky=tk.W)
+        self.search_entry.grid(row=0, column=1, padx=1, pady=4, sticky=tk.W)
+        self.iv_entry.grid(row=1, column=1, padx=1, pady=4, sticky=tk.W)
         # Buttons
         self.search_button.grid(row=0, column=2, sticky=tk.W)
         self.iv_lookup_button.grid(row=1, column=2, sticky=tk.W)
