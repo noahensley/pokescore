@@ -65,21 +65,21 @@ class UIInfo (object):
         self.iv_label = ttk.Label(self.interface_frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray", style='LargeBold.TLabel')
         self.iv_lookup_status_label = ttk.Label(self.interface_frame, text="", foreground="blue", style='Small.TLabel')
         self.result_header = ttk.Label(self.results_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                               style='LargeBold.TLabel', background="red")
+                               style='LargeBold.TLabel')
         self.suggestions_header = ttk.Label(self.suggestions_frame, text="TEST", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                                        style='Large.TLabel', background="orange")
+                                        style='Large.TLabel')
         self.leagues_header = ttk.Label(self.leagues_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                                        style='LargeBold.TLabel', background="yellow")
+                                        style='LargeBold.TLabel')
         self.leagues_contents = ttk.Label(self.leagues_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                                        style='Large.TLabel', background="green")
+                                        style='Large.TLabel')
         self.moveset_header = ttk.Label(self.moveset_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                                        style='LargeBold.TLabel', background="blue")
+                                        style='LargeBold.TLabel')
         self.moveset_contents = ttk.Label(self.moveset_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                                        style='Large.TLabel', background="indigo")
+                                        style='Large.TLabel')
         self.iv_header = ttk.Label(self.iv_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                                style='LargeBold.TLabel', background="violet")
+                                style='LargeBold.TLabel')
         self.iv_contents = ttk.Label(self.iv_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
-                                    style='Large.TLabel', background="#E6CCFF")  # light violet
+                                    style='Large.TLabel')  # light violet
 
         self.download_label = ttk.Label(self.download_frame, text="", foreground="blue", style='Large.TLabel')
         # Entries
