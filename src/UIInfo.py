@@ -477,10 +477,13 @@ class UIInfo (object):
             if self.result_info['Other Leagues']:
                 self.leagues_header.config(text="Other Leagues:")
                 other_leagues = self.result_info['Other Leagues']
-                for league in other_leagues:
+                num_leagues = len(other_leagues)
+                for idx, league in enumerate(other_leagues):
                     cur_rank = other_leagues[league][0][0]
                     cur_score = other_leagues[league][0][1]
-                    result_leagues_text += f"{league} League: Rank #{cur_rank} (Score: {cur_score})\n"
+                    result_leagues_text += f"{league} League: Rank #{cur_rank} (Score: {cur_score})"
+                    if idx < num_leagues - 1:
+                        result_leagues_text += "\n" # Ensure no trailing newline
                     # Add current league best moveset (if different from best league moveset)
                     if self.do_show_moveset.get() and other_leagues[league][1] != self.result_info['Best Moveset']:
                         result_leagues_text += (f" ({other_leagues[league][1]['Fast']}, "
@@ -516,8 +519,11 @@ class UIInfo (object):
         result_iv_text = ""
         if self.iv_rankings:
             self.iv_header.config(text="IV Rankings:")
-            for league in self.iv_rankings:
-                result_iv_text += f"{league}: {self.iv_info.stringify_ivs()} => #{self.iv_rankings[league]}\n"
+            num_leagues = len(self.iv_rankings.keys())
+            for idx, league in enumerate(self.iv_rankings):
+                result_iv_text += f"{league}: {self.iv_info.stringify_ivs()} => #{self.iv_rankings[league]}"
+                if idx < num_leagues - 1:
+                    result_iv_text += "\n" # Ensure no trailing newline
 
             self.iv_contents.config(text=result_iv_text)
         

@@ -3,4 +3,3 @@
 3. Combine the search/lookup buttons into one.
 4. Finish formatting results by splitting into headers/contents
 5. Suggestion buttons are active during download.  Disable.
-6. Trim frame headers of newlines when not needed.
