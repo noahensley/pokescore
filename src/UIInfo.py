@@ -26,9 +26,19 @@ class UIInfo (object):
         self.root = tk.Tk()
         self.root.title("Go Battle League Pokémon Ranking")
         self.root.geometry("600x500")
+        # ROW 
+        self.root.rowconfigure(0, weight=0)  # interface_frame
+        self.root.rowconfigure(1, weight=0)  # results_frame  
+        self.root.rowconfigure(2, weight=0)  # suggestions_frame
+        self.root.rowconfigure(3, weight=0)  # leagues_frame
+        self.root.rowconfigure(4, weight=0)  # moveset_frame
+        self.root.rowconfigure(5, weight=0)  # iv_frame
+        self.root.rowconfigure(6, weight=1)  # download_frame (expandable)
+        # COLUMN
         self.root.columnconfigure(0, weight=1)
-        self.root.rowconfigure(0, weight=1)
-
+        self.root.columnconfigure(1, weight=0)  # Add columns 1 and 2
+        self.root.columnconfigure(2, weight=0)  # to support columnspan=3
+        
         # INIT
         # Styles
         ttk.Style().theme_use('clam')
@@ -40,39 +50,44 @@ class UIInfo (object):
         button_style.configure('Large.TButton', font=('Arial', 12), foreground='black', background='#d9d9d9')
         button_style.map('Large.TButton', 
                          background=[('active', '#bfbfbf')])
+        self.root.configure(bg=ttk.Style().lookup('TFrame', 'background')) # Match the root frame bg to the others
         # Frames
-        self.frame = ttk.Frame(self.root, padding="10")
-        self.download_frame = ttk.Frame(self.frame)
-        self.suggestions_frame = ttk.Frame(self.frame)
+        self.interface_frame = ttk.Frame(self.root, padding="5")
+        self.results_frame = ttk.Frame(self.root, padding="5")
+        self.leagues_frame = ttk.Frame(self.root, padding="5")
+        self.moveset_frame = ttk.Frame(self.root, padding="5")
+        self.iv_frame = ttk.Frame(self.root, padding="5")
+        self.suggestions_frame = ttk.Frame(self.root, padding="5")
+        self.download_frame = ttk.Frame(self.root, padding="5")
         # Labels
-        self.search_label = ttk.Label(self.frame, text="Enter Pokémon Name:", style='LargeBold.TLabel')
-        self.iv_label = ttk.Label(self.frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray", style='LargeBold.TLabel')
-        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue", style='Small.TLabel')
-        self.result_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.search_label = ttk.Label(self.interface_frame, text="Enter Pokémon Name:", style='LargeBold.TLabel')
+        self.iv_label = ttk.Label(self.interface_frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray", style='LargeBold.TLabel')
+        self.iv_lookup_status_label = ttk.Label(self.interface_frame, text="", foreground="blue", style='Small.TLabel')
+        self.result_header = ttk.Label(self.results_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                style='LargeBold.TLabel', background="red")
-        self.result_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.suggestions_header = ttk.Label(self.suggestions_frame, text="TEST", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                         style='Large.TLabel', background="orange")
-        self.leagues_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.leagues_header = ttk.Label(self.leagues_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                         style='LargeBold.TLabel', background="yellow")
-        self.leagues_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.leagues_contents = ttk.Label(self.leagues_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                         style='Large.TLabel', background="green")
-        self.moveset_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.moveset_header = ttk.Label(self.moveset_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                         style='LargeBold.TLabel', background="blue")
-        self.moveset_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.moveset_contents = ttk.Label(self.moveset_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                         style='Large.TLabel', background="indigo")
-        self.iv_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.iv_header = ttk.Label(self.iv_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                 style='LargeBold.TLabel', background="violet")
-        self.iv_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+        self.iv_contents = ttk.Label(self.iv_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                     style='Large.TLabel', background="#E6CCFF")  # light violet
 
         self.download_label = ttk.Label(self.download_frame, text="", foreground="blue", style='Large.TLabel')
         # Entries
-        self.search_entry = ttk.Entry(self.frame, width=25, font=('Arial', 12))
-        self.iv_entry = ttk.Entry(self.frame, width=10, font=('Arial', 12))
+        self.search_entry = ttk.Entry(self.interface_frame, width=25, font=('Arial', 12))
+        self.iv_entry = ttk.Entry(self.interface_frame, width=10, font=('Arial', 12))
         # Buttons
-        self.search_button = ttk.Button(self.frame, text="Search", style='Large.TButton',
+        self.search_button = ttk.Button(self.interface_frame, text="Search", style='Large.TButton',
                                         command=lambda: self.search_pokemon())
-        self.iv_lookup_button = ttk.Button(self.frame, text="Lookup", style='Large.TButton',
+        self.iv_lookup_button = ttk.Button(self.interface_frame, text="Lookup", style='Large.TButton',
                                            command=lambda: self.assign_web_info())
         self.download_assets_button = ttk.Button(self.download_frame, text="Download Assets", style='Large.TButton',
                                                  command=lambda: self.download_assets())
@@ -81,7 +96,7 @@ class UIInfo (object):
         self.do_show_moveset = tk.BooleanVar(value=False) # Initially unchecked
         # Checkbuttons
         self.show_all_ranks_checkbox = ttk.Checkbutton(
-                        self.frame, 
+                        self.interface_frame, 
                         text="Show scores in other leagues",
                         variable=self.do_show_all_ranks,
                         style='Large.TCheckbutton',
@@ -89,7 +104,7 @@ class UIInfo (object):
                     )
         
         self.show_moveset_checkbox = ttk.Checkbutton(
-                        self.frame,
+                        self.interface_frame,
                         text="Show moveset",
                         variable=self.do_show_moveset,
                         style='Large.TCheckbutton',
@@ -98,19 +113,21 @@ class UIInfo (object):
         
         # CONFIG
         # Frames
-        self.frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame) (?)
-        self.frame.grid_columnconfigure(1, weight=1)  # Search entry (expanding)
-        self.frame.grid_rowconfigure(2, weight=0) # Checkbuttons
-        self.frame.grid_rowconfigure(3, weight=0) # Result header
-        self.frame.grid_rowconfigure(4, weight=0) # Result contents
-        self.frame.grid_rowconfigure(5, weight=0) # Leagues header
-        self.frame.grid_rowconfigure(6, weight=0) # Leagues contents
-        self.frame.grid_rowconfigure(7, weight=0) # Moveset header
-        self.frame.grid_rowconfigure(8, weight=0) # Moveset contents
-        self.frame.grid_rowconfigure(9, weight=0) # IV header
-        self.frame.grid_rowconfigure(10, weight=0) # IV contents
-        self.frame.grid_rowconfigure(11, weight=0) # Suggestion buttons
-        self.frame.grid_rowconfigure(99, weight=1)  # Push bottom_frame to the bottom
+        self.interface_frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame) (?)
+        self.interface_frame.grid_columnconfigure(1, weight=1)  # Search entry (expanding)
+        self.interface_frame.grid_rowconfigure(2, weight=0) # Checkbuttons
+        self.interface_frame.grid_rowconfigure(3, weight=1)  # Push download_frame to the bottom
+        self.results_frame.grid_columnconfigure(0, weight=1) # Frames stretch to the left
+        self.results_frame.grid_rowconfigure(0, weight=0) # Result header
+        self.results_frame.grid_rowconfigure(1, weight=0) # Result contents
+        self.leagues_frame.grid_rowconfigure(0, weight=0) # Leagues header
+        self.leagues_frame.grid_rowconfigure(1, weight=0) # Leagues contents
+        self.moveset_frame.grid_rowconfigure(0, weight=0) # Moveset header
+        self.moveset_frame.grid_rowconfigure(1, weight=0) # Moveset contents
+        self.iv_frame.grid_rowconfigure(0, weight=0) # IV header
+        self.iv_frame.grid_rowconfigure(1, weight=0) # IV contents
+        self.suggestions_frame.grid_rowconfigure(0, weight=0) # Suggestion buttons
+        self.suggestions_frame.grid_columnconfigure(0, weight=1)
         # Buttons
         self.iv_lookup_button.config(state=tk.DISABLED) # Disable before pokemon is searched
         # Entries
@@ -118,22 +135,26 @@ class UIInfo (object):
 
         # GRID
         # Frames
-        self.frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        self.suggestions_frame.grid(row=4, column=0, columnspan=3, pady=10, sticky=(tk.W, tk.E))
-        self.download_frame.grid(row=99, column=0, columnspan=2, sticky=tk.SW)
+        self.interface_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        """self.results_frame.grid(row=1, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.leagues_frame.grid(row=2, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.moveset_frame.grid(row=3, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.iv_frame.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+        self.suggestions_frame.grid(row=5, column=0, columnspan=1, sticky=(tk.W, tk.E))"""
+        self.download_frame.grid(row=6, column=0, columnspan=2, sticky=tk.SW)
         # Labels
         self.search_label.grid(row=0, column=0, padx=1, pady=0, sticky=tk.W)
         self.iv_label.grid(row=1, column=0, padx=1, pady=0, sticky=tk.W)
         self.iv_lookup_status_label.grid(row=1, column=1, columnspan=2, padx=100, sticky=tk.W)
         self.download_label.grid(row=0, column=1, padx=3, pady=0, sticky=tk.W) # row 0 of download_frame
-        self.result_header.grid(row=3, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
-        self.result_contents.grid(row=4, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
-        self.leagues_header.grid(row=5, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
-        self.leagues_contents.grid(row=6, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
-        self.moveset_header.grid(row=7, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
-        self.moveset_contents.grid(row=8, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
-        self.iv_header.grid(row=9, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
-        self.iv_contents.grid(row=10, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.result_header.grid(row=0, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E)) # rows 0...10 of results_frame
+        self.suggestions_header.grid(row=0, column=0, columnspan=3, pady=(0,3), sticky=(tk.W, tk.E)) # 0 top padding, 3 bottom
+        self.leagues_header.grid(row=0, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.leagues_contents.grid(row=1, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.moveset_header.grid(row=0, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.moveset_contents.grid(row=1, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.iv_header.grid(row=0, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.iv_contents.grid(row=1, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
         # Entries
         self.search_entry.grid(row=0, column=1, padx=1, pady=4, sticky=tk.W)
         self.iv_entry.grid(row=1, column=1, padx=1, pady=4, sticky=tk.W)
@@ -166,7 +187,8 @@ class UIInfo (object):
             return
 
         # Clear previous search results
-        self.result_contents.config(text="")
+        self.result_header.config(text="")
+        self.suggestions_header.config(text="")
         self.clear_suggestion_buttons()
         # Hide checkboxes each search
         self.show_all_ranks_checkbox.grid_remove()
@@ -236,9 +258,10 @@ class UIInfo (object):
 
         ivs = [item.strip() for item in ivs.split(",")]
 
-        if ivs == [self.iv_info.attack_iv, self.iv_info.defense_iv, self.iv_info.stamina_iv] and name == self.iv_info.pokemon_name:
-            self.iv_lookup_status_label.config(text="IVs already displayed.", foreground="blue")
-            return
+        if self.iv_info != None:
+            if ivs == [self.iv_info.attack_iv, self.iv_info.defense_iv, self.iv_info.stamina_iv] and name == self.iv_info.pokemon_name:
+                self.iv_lookup_status_label.config(text="IVs already displayed.", foreground="blue")
+                return
 
         self.iv_info.pokemon_name = self.capitalize_name_ext(name)
         self.iv_info.attack_iv = ivs[0]
@@ -272,21 +295,22 @@ class UIInfo (object):
 
         # Display the "not found" message
         self.result_header.config(text=f"{self.result_info['Name']} not found in any League.")
-        self.result_contents.config(text="Did you mean one of these?")
+        self.suggestions_header.config(text="Did you mean one of these?")
 
         # Create buttons for each suggestion using grid
         for idx, name in enumerate(suggestions):
             button = ttk.Button(
-                self.result_contents.master,  # Parent widget
+                self.suggestions_frame,  # Parent widget
                 text=name,
                 command=lambda n=name: self.search_entry.delete(0, tk.END) or self.search_entry.insert(0, n) or self.search_pokemon()
             )
-            button.grid(row=idx + 11, column=0, columnspan=3, pady=5, sticky=tk.EW)  # +11 so they are below results
+            button.grid(row=idx + 1, column=0, columnspan=3, pady=5, padx=10, sticky=tk.EW)  # +1 to avoid row 0 conflict (suggestion frame)
             self.suggestion_buttons.append(button)  # Track the button
 
 
     def clear_suggestion_buttons(self):
         for button in self.suggestion_buttons:
+            #print("Destroying button:", button.cget("text"))
             button.destroy()  # Remove the button from the UI
         self.suggestion_buttons.clear()  # Clear the list
 
@@ -370,7 +394,63 @@ class UIInfo (object):
         self.populate_leagues_result()
         self.populate_moveset_result()
         self.populate_iv_result()
+        self.manage_frame_visibility()
 
+
+    def manage_frame_visibility(self):
+        """
+        Show or hide frames based on whether they have content.
+        """
+        # Check if results frame has any content
+        for frame in self.root.children:
+            cur_frame = self.root.children[frame]
+            if cur_frame is self.interface_frame or cur_frame is self.download_frame:
+                continue
+            self.root.children[frame].grid_remove() # Initially hide all frames
+
+        cur_row = 1
+        for idx, child_name in enumerate(self.root.children):
+            frame = self.root.children[child_name]
+            
+            # Skip the download frame
+            if frame is self.download_frame or frame is self.interface_frame:
+                continue
+                
+            if isinstance(frame, (tk.Frame, ttk.Frame)):
+                has_content = False
+                
+                # Special handling for suggestions frame - check if it has buttons
+                if frame is self.suggestions_frame:
+                    has_content = len(self.suggestion_buttons) > 0
+                    # Also check if the header has text
+                    if not has_content:
+                        try:
+                            header_text = self.suggestions_header.cget("text")
+                            has_content = header_text and header_text.strip()
+                        except tk.TclError:
+                            pass
+                else:
+                    # Check the frame's children for labels with text
+                    for child_widget_name in frame.children:
+                        child_widget = frame.children[child_widget_name]
+                        
+                        # Only check labels for text content
+                        if isinstance(child_widget, (tk.Label, ttk.Label)):
+                            try:
+                                text = child_widget.cget("text")
+                                if text and text.strip():  # Not empty or just whitespace
+                                    has_content = True
+                                    break
+                            except tk.TclError:
+                                pass
+                
+                # Show or hide the frame based on content
+                if has_content:
+                    frame.grid(row=cur_row, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
+                    cur_row += 1
+                else:
+                    frame.grid_remove()
+                    
 
     def populate_results_header(self):
         result_header_text = ""
