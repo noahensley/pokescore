@@ -37,9 +37,9 @@ class UIInfo (object):
         ttk.Style().configure('Small.TLabel', font=('Arial', 10))
         ttk.Style().configure('Large.TCheckbutton', font=('Arial', 11))
         button_style = ttk.Style()
-        button_style.configure('Large.TButton', font=('Arial', 12), foreground='white', background='#007bff')
+        button_style.configure('Large.TButton', font=('Arial', 12), foreground='black', background='#d9d9d9')
         button_style.map('Large.TButton', 
-                         background=[('active', '#0056b3')])
+                         background=[('active', '#bfbfbf')])
         # Frames
         self.frame = ttk.Frame(self.root, padding="10")
         self.download_frame = ttk.Frame(self.frame)
@@ -47,9 +47,9 @@ class UIInfo (object):
         # Labels
         self.search_label = ttk.Label(self.frame, text="Enter Pokémon Name:", style='LargeBold.TLabel')
         self.iv_label = ttk.Label(self.frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray", style='LargeBold.TLabel')
-        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue", style='LargeBold.TLabel')
-        self.result_label = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W, style='LargeBold.TLabel')
-        self.download_label = ttk.Label(self.download_frame, text="", foreground="blue", style='LargeBold.TLabel')
+        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue", style='Large.TLabel')
+        self.result_label = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W, style='Large.TLabel')
+        self.download_label = ttk.Label(self.download_frame, text="", foreground="blue", style='Large.TLabel')
         # Entries
         self.search_entry = ttk.Entry(self.frame, width=25, font=('Arial', 12))
         self.iv_entry = ttk.Entry(self.frame, width=10, font=('Arial', 12))
