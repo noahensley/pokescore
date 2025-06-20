@@ -21,6 +21,7 @@ class UIInfo (object):
         self.result_info = {}
         self.iv_rankings = {}
         self.iv_info = WebInfo.WebInfo()
+        self.previous_label_color = {}
 
         # ROOT
         self.root = tk.Tk()
@@ -233,7 +234,6 @@ class UIInfo (object):
         # Enable IV Lookup
         self.iv_entry.config(state=tk.NORMAL)
         self.iv_lookup_button.config(state=tk.NORMAL)
-        self.iv_label.config(foreground="")
         self.iv_lookup_status_label.config(text="") # Clear Success code
         self.iv_entry.delete(0, tk.END) # Clear IV input on new search
 
@@ -321,8 +321,23 @@ class UIInfo (object):
         self.iv_entry.config(state=tk.DISABLED)
         self.search_button.config(state=tk.DISABLED)
         self.iv_lookup_button.config(state=tk.DISABLED)
+        for button in self.suggestion_buttons:
+            button.config(state=tk.DISABLED)
         self.download_assets_button.config(state=tk.DISABLED)
-        self.disable_close()  # Disable close button
+        # Change text visuals
+        for inner_frame in self.root.children:
+            frame = self.root.children[inner_frame]
+            for frame_child in frame.children:
+                child = frame.children[frame_child]
+                if child is self.download_label:
+                    continue # Keep the status code color
+                if isinstance(child, (tk.Label, ttk.Label)):
+                    if child.cget("text"):
+                        prev_color = child.cget("foreground")
+                        self.previous_label_color[child] = prev_color # Store current color
+                        child.config(foreground="dim grey")
+
+        self.disable_close() # Disable close button
 
 
     def reenable_ui(self):
@@ -331,7 +346,20 @@ class UIInfo (object):
         self.iv_entry.config(state=tk.NORMAL)
         self.search_button.config(state=tk.NORMAL)
         self.iv_lookup_button.config(state=tk.NORMAL)
+        for button in self.suggestion_buttons:
+            button.config(state=tk.NORMAL)
         self.download_assets_button.config(state=tk.NORMAL)
+        # Restore text visuals
+        for inner_frame in self.root.children:
+            frame = self.root.children[inner_frame]
+            for frame_child in frame.children:
+                child = frame.children[frame_child]
+                if child is self.download_label:
+                    continue # This color never changed
+                if isinstance(child, (tk.Label, ttk.Label)):
+                    if child.cget("text"):
+                        color = self.previous_label_color[child]
+                        child.config(foreground=color)
         self.reenable_close()  # Restore close button
 
 
@@ -409,7 +437,7 @@ class UIInfo (object):
             self.root.children[frame].grid_remove() # Initially hide all frames
 
         cur_row = 1
-        for idx, child_name in enumerate(self.root.children):
+        for child_name in self.root.children:
             frame = self.root.children[child_name]
             
             # Skip the download frame
