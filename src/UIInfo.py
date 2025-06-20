@@ -47,9 +47,24 @@ class UIInfo (object):
         # Labels
         self.search_label = ttk.Label(self.frame, text="Enter Pokémon Name:", style='LargeBold.TLabel')
         self.iv_label = ttk.Label(self.frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray", style='LargeBold.TLabel')
-        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue", style='Large.TLabel')
-        self.result_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W, style='LargeBold.TLabel')
-        self.result_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W, style='Large.TLabel')
+        self.iv_lookup_status_label = ttk.Label(self.frame, text="", foreground="blue", style='Small.TLabel')
+        self.result_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                               style='LargeBold.TLabel', background="red")
+        self.result_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                                        style='Large.TLabel', background="orange")
+        self.leagues_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                                        style='LargeBold.TLabel', background="yellow")
+        self.leagues_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                                        style='Large.TLabel', background="green")
+        self.moveset_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                                        style='LargeBold.TLabel', background="blue")
+        self.moveset_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                                        style='Large.TLabel', background="indigo")
+        self.iv_header = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                                style='LargeBold.TLabel', background="violet")
+        self.iv_contents = ttk.Label(self.frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
+                                    style='Large.TLabel', background="#E6CCFF")  # light violet
+
         self.download_label = ttk.Label(self.download_frame, text="", foreground="blue", style='Large.TLabel')
         # Entries
         self.search_entry = ttk.Entry(self.frame, width=25, font=('Arial', 12))
@@ -70,7 +85,7 @@ class UIInfo (object):
                         text="Show scores in other leagues",
                         variable=self.do_show_all_ranks,
                         style='Large.TCheckbutton',
-                        command=lambda: self.populate_result_contents()
+                        command=lambda: self.populate_results()
                     )
         
         self.show_moveset_checkbox = ttk.Checkbutton(
@@ -78,17 +93,23 @@ class UIInfo (object):
                         text="Show moveset",
                         variable=self.do_show_moveset,
                         style='Large.TCheckbutton',
-                        command=lambda: self.populate_result_contents()
+                        command=lambda: self.populate_results()
                     )
         
         # CONFIG
         # Frames
-        self.frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame)
-        self.frame.grid_columnconfigure(1, weight=1)  # Search entry should expand
-        self.frame.grid_rowconfigure(2, weight=0) # Row for checkbuttons
-        self.frame.grid_rowconfigure(3, weight=0) # Row for results
-        self.frame.grid_rowconfigure(4, weight=0)
-        self.frame.grid_rowconfigure(5, weight=0)
+        self.frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame) (?)
+        self.frame.grid_columnconfigure(1, weight=1)  # Search entry (expanding)
+        self.frame.grid_rowconfigure(2, weight=0) # Checkbuttons
+        self.frame.grid_rowconfigure(3, weight=0) # Result header
+        self.frame.grid_rowconfigure(4, weight=0) # Result contents
+        self.frame.grid_rowconfigure(5, weight=0) # Leagues header
+        self.frame.grid_rowconfigure(6, weight=0) # Leagues contents
+        self.frame.grid_rowconfigure(7, weight=0) # Moveset header
+        self.frame.grid_rowconfigure(8, weight=0) # Moveset contents
+        self.frame.grid_rowconfigure(9, weight=0) # IV header
+        self.frame.grid_rowconfigure(10, weight=0) # IV contents
+        self.frame.grid_rowconfigure(11, weight=0) # Suggestion buttons
         self.frame.grid_rowconfigure(99, weight=1)  # Push bottom_frame to the bottom
         # Buttons
         self.iv_lookup_button.config(state=tk.DISABLED) # Disable before pokemon is searched
@@ -103,10 +124,16 @@ class UIInfo (object):
         # Labels
         self.search_label.grid(row=0, column=0, padx=1, pady=0, sticky=tk.W)
         self.iv_label.grid(row=1, column=0, padx=1, pady=0, sticky=tk.W)
-        self.iv_lookup_status_label.grid(row=1, column=1, padx=100, sticky=tk.W)
+        self.iv_lookup_status_label.grid(row=1, column=1, columnspan=2, padx=100, sticky=tk.W)
         self.download_label.grid(row=0, column=1, padx=3, pady=0, sticky=tk.W) # row 0 of download_frame
-        self.result_header.grid(row=3, column=0, columnspan=3, pady=3, sticky=(tk.W, tk.E))
+        self.result_header.grid(row=3, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
         self.result_contents.grid(row=4, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.leagues_header.grid(row=5, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.leagues_contents.grid(row=6, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.moveset_header.grid(row=7, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.moveset_contents.grid(row=8, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.iv_header.grid(row=9, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
+        self.iv_contents.grid(row=10, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
         # Entries
         self.search_entry.grid(row=0, column=1, padx=1, pady=4, sticky=tk.W)
         self.iv_entry.grid(row=1, column=1, padx=1, pady=4, sticky=tk.W)
@@ -135,7 +162,7 @@ class UIInfo (object):
         supplied_name = self.search_entry.get().strip().lower()
 
         if not supplied_name:
-            messagebox.showwarning("Input Error", "Please enter a Pokémon name.")
+            messagebox.showwarning("Input Error", "Please enter a Pokémon.")
             return
 
         # Clear previous search results
@@ -175,7 +202,7 @@ class UIInfo (object):
         
         self.iv_rankings = {} # Reset IV info on new searchs
         # Display results or display suggestions
-        self.populate_result_contents()
+        self.populate_results()
 
         # Focus and select all text in the search entry
         self.search_entry.focus_set()
@@ -227,7 +254,7 @@ class UIInfo (object):
         self.iv_lookup_status_label.config(text="Success", foreground="blue")
         # Copy the results to the UIInfo in ascending order
         self.iv_rankings = dict(sorted(self.iv_info.ranks.items(), key=lambda item: int(item[1])))
-        self.populate_result_contents()
+        self.populate_results()
 
         # Highlight IV entry selection
         self.iv_entry.focus_set()
@@ -244,7 +271,8 @@ class UIInfo (object):
         self.suggestion_buttons.clear()
 
         # Display the "not found" message
-        self.result_contents.config(text=f"{self.result_info['Name']} not found in any League.\nDid you mean one of these?")
+        self.result_header.config(text=f"{self.result_info['Name']} not found in any League.")
+        self.result_contents.config(text="Did you mean one of these?")
 
         # Create buttons for each suggestion using grid
         for idx, name in enumerate(suggestions):
@@ -253,7 +281,7 @@ class UIInfo (object):
                 text=name,
                 command=lambda n=name: self.search_entry.delete(0, tk.END) or self.search_entry.insert(0, n) or self.search_pokemon()
             )
-            button.grid(row=idx + 5, column=0, columnspan=3, pady=5, sticky=tk.EW)  # +4 so they are below the text
+            button.grid(row=idx + 11, column=0, columnspan=3, pady=5, sticky=tk.EW)  # +11 so they are below results
             self.suggestion_buttons.append(button)  # Track the button
 
 
@@ -337,9 +365,15 @@ class UIInfo (object):
         fetch_thread.start()
 
 
-    def populate_result_contents(self):
+    def populate_results(self):
+        self.populate_results_header()
+        self.populate_leagues_result()
+        self.populate_moveset_result()
+        self.populate_iv_result()
+
+
+    def populate_results_header(self):
         result_header_text = ""
-        result_text = ""
         if not self.result_info:
             self.result_header.config(text=result_header_text)
             return
@@ -356,37 +390,61 @@ class UIInfo (object):
         f"with a score of {self.result_info['Score']} in the {self.result_info['League']} League.")
         self.result_header.config(text=result_header_text)
 
-        if self.do_show_moveset.get():
-            best_moveset = self.result_info['Best Moveset']
-            result_text += (f"Best moveset: {best_moveset['Fast']}, {best_moveset['Charged1']}, "
-                            f"{best_moveset['Charged2']}")
-            if self.do_show_all_ranks.get():
-                result_text += "\n"
 
+    def populate_leagues_result(self):
+        result_leagues_text = ""
         if self.do_show_all_ranks.get():
             if self.result_info['Other Leagues']:
+                self.leagues_header.config(text="Other Leagues:")
                 other_leagues = self.result_info['Other Leagues']
-                result_text += "Other leagues:"
                 for league in other_leagues:
                     cur_rank = other_leagues[league][0][0]
                     cur_score = other_leagues[league][0][1]
-                    result_text += f"\n{league} League: Rank #{cur_rank} (Score: {cur_score})"
+                    result_leagues_text += f"{league} League: Rank #{cur_rank} (Score: {cur_score})\n"
                     # Add current league best moveset (if different from best league moveset)
                     if self.do_show_moveset.get() and other_leagues[league][1] != self.result_info['Best Moveset']:
-                        result_text += (f" ({other_leagues[league][1]['Fast']}, "
+                        result_leagues_text += (f" ({other_leagues[league][1]['Fast']}, "
                         f"{other_leagues[league][1]['Charged1']}, "
                         f"{other_leagues[league][1]['Charged2']})")
             else:
-                result_text += f"\n{self.result_info['Name']} not found in any other leagues."
+                self.leagues_header.config(text=f"{self.result_info['Name']} not found in any other leagues.")
 
+        else:
+            # DO NOT show ranks
+            self.leagues_header.config(text="")
+            self.leagues_contents.config(text="")
+
+        self.leagues_contents.config(text=result_leagues_text)
+
+
+    def populate_moveset_result(self):
+        if self.do_show_moveset.get():
+            self.moveset_header.config(text="Best Moveset:")
+            best_moveset = self.result_info['Best Moveset']
+            result_moveset_text = (f"{best_moveset['Fast']}, {best_moveset['Charged1']}, "
+                            f"{best_moveset['Charged2']}")
+
+            self.moveset_contents.config(text=result_moveset_text)
+        
+        else:
+            # DO NOT show moveset
+            self.moveset_header.config(text="")
+            self.moveset_contents.config(text="")
+
+
+    def populate_iv_result(self):
+        result_iv_text = ""
         if self.iv_rankings:
-            if self.do_show_moveset.get() or self.do_show_all_ranks.get():
-                result_text += "\n"
-            result_text += f"IV Rankings:"
+            self.iv_header.config(text="IV Rankings:")
             for league in self.iv_rankings:
-                result_text += f"\n{league}: {self.iv_info.stringify_ivs()} => #{self.iv_rankings[league]}"
+                result_iv_text += f"{league}: {self.iv_info.stringify_ivs()} => #{self.iv_rankings[league]}\n"
 
-        self.result_contents.config(text=result_text)
+            self.iv_contents.config(text=result_iv_text)
+        
+        else:
+            # DO NOT show IV rankings
+            self.iv_header.config(text="")
+            self.iv_contents.config(text="")
 
 
     def compare_rankings(self, query_name):
