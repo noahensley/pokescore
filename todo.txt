@@ -4,3 +4,4 @@
 4. Newlines missing from multiple other leagues.  Fix that.
 5. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
 6. All buttons needs a little more padding.
+7. Capitalize function doesn't work for two-worded tags (e.g. (Rapid Strike))
