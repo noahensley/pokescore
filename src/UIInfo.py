@@ -510,12 +510,20 @@ class UIInfo (object):
                         result_leagues_text += "\n" # Ensure no trailing newline
                     # Add current league best moveset (if different from best league moveset)
                     if self.do_show_moveset.get():
-                        alt_moveset = sorted(other_leagues[league][1].values())
-                        shown_moveset = sorted(self.result_info['Best Moveset'].values())
-                        if alt_moveset != shown_moveset:
-                            result_leagues_text += (f"\n({other_leagues[league][1]['Fast']}, "
-                            f"{other_leagues[league][1]['Charged1']}, "
-                            f"{other_leagues[league][1]['Charged2']})")
+                        alt_moveset = other_leagues[league][1].values()
+                        shown_moveset = self.result_info['Best Moveset'].values()
+                        if sorted(alt_moveset) != sorted(shown_moveset):
+                            different_moves = list(set(alt_moveset) - set(shown_moveset))
+                            result_leagues_text += (" (Diff: ")
+                            for idx, move in enumerate(different_moves):
+                                result_leagues_text += (f"*{move}")
+                                if idx < len(different_moves) - 1:
+                                    result_leagues_text += ", "
+                                else:
+                                    result_leagues_text += ")"
+
+
+
             else:
                 self.leagues_header.config(text=f"{self.result_info['Name']} not found in any other leagues.")
 
