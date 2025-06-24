@@ -5,4 +5,3 @@
 5. Newlines missing from multiple other leagues.  Fix that.
 6. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
 7. All buttons needs a little more padding.
-8. Alternate moveset sometimes wraps to a newline.  Maybe give it a line by itself?

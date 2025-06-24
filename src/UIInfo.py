@@ -137,11 +137,7 @@ class UIInfo (object):
         # GRID
         # Frames
         self.interface_frame.grid(row=0, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        """self.results_frame.grid(row=1, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        self.leagues_frame.grid(row=2, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        self.moveset_frame.grid(row=3, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        self.iv_frame.grid(row=4, column=0, sticky=(tk.W, tk.E, tk.N, tk.S))
-        self.suggestions_frame.grid(row=5, column=0, columnspan=1, sticky=(tk.W, tk.E))"""
+        # results_frame is dynamically generated based on search
         self.download_frame.grid(row=6, column=0, columnspan=2, sticky=tk.SW)
         # Labels
         self.search_label.grid(row=0, column=0, padx=1, pady=0, sticky=tk.W)
@@ -514,7 +510,7 @@ class UIInfo (object):
                         result_leagues_text += "\n" # Ensure no trailing newline
                     # Add current league best moveset (if different from best league moveset)
                     if self.do_show_moveset.get() and other_leagues[league][1] != self.result_info['Best Moveset']:
-                        result_leagues_text += (f" ({other_leagues[league][1]['Fast']}, "
+                        result_leagues_text += (f"\n({other_leagues[league][1]['Fast']}, "
                         f"{other_leagues[league][1]['Charged1']}, "
                         f"{other_leagues[league][1]['Charged2']})")
             else:
