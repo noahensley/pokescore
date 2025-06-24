@@ -156,9 +156,9 @@ class UIInfo (object):
         self.search_entry.grid(row=0, column=1, padx=1, pady=4, sticky=tk.W)
         self.iv_entry.grid(row=1, column=1, padx=1, pady=4, sticky=tk.W)
         # Buttons
-        self.search_button.grid(row=0, column=2, sticky=tk.W)
-        self.iv_lookup_button.grid(row=1, column=2, sticky=tk.W)
-        self.download_assets_button.grid(row=0, column=0, padx=0, pady=0, sticky=tk.W) # row 0 of download_frame
+        self.search_button.grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
+        self.iv_lookup_button.grid(row=1, column=2, padx=5, pady=0, sticky=tk.W)
+        self.download_assets_button.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W) # row 0 of download_frame
         # Checkbuttons
         self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=2, pady=1, sticky=tk.W)
         self.show_moveset_checkbox.grid(row=2, column=1, columnspan=1, padx=50, pady=1, sticky=tk.W) # padx to not overlap
