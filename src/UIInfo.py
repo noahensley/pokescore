@@ -26,7 +26,6 @@ class UIInfo (object):
         # ROOT
         self.root = tk.Tk()
         self.root.title("Go Battle League Pokémon Ranking")
-        self.root.geometry("600x500")
         # ROW 
         self.root.rowconfigure(0, weight=0)  # interface_frame
         self.root.rowconfigure(1, weight=0)  # results_frame  
