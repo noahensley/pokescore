@@ -1,7 +1,6 @@
 1. Threads return OK when download fails.  This is because the threads simply start the download, not ensure the files appear.
 2. Add forms information allowing the user to "see different evos"
 3. Combine the search/lookup buttons into one.
-4. Unordered movesets appear different between ranks when they are not.  Fix that.
-5. Newlines missing from multiple other leagues.  Fix that.
-6. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
-7. All buttons needs a little more padding.
+4. Newlines missing from multiple other leagues.  Fix that.
+5. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
+6. All buttons needs a little more padding.
