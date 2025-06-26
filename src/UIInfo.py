@@ -236,7 +236,7 @@ class UIInfo (object):
     def assign_web_info(self):
         name = self.search_entry.get().strip().lower()
         ivs = self.iv_entry.get().strip().lower()
-        name = self.remove_shadow_ext(name)
+        name = self.remove_shadow_label(name)
         
         match = re.search(core.iv_pattern, ivs)
 
@@ -258,7 +258,7 @@ class UIInfo (object):
                 self.iv_lookup_status_label.config(text="IVs already displayed.", foreground="blue")
                 return
 
-        self.iv_info.pokemon_name = self.capitalize_name_ext(name)
+        self.iv_info.pokemon_name = self.capitalize_form_label(name)
         self.iv_info.attack_iv = ivs[0]
         self.iv_info.defense_iv = ivs[1]
         self.iv_info.stamina_iv = ivs[2]
@@ -584,7 +584,7 @@ class UIInfo (object):
                 best_score = cur_score
                 best_league = league
 
-        query_name = self.capitalize_name_ext(query_name)
+        query_name = self.capitalize_form_label(query_name)
         self.result_info['Name'] = query_name # This is needed even if not found
         if best_league:
             best_moveset = all_leagues[best_league][1]
@@ -633,7 +633,11 @@ class UIInfo (object):
         return "break"
 
 
-    def remove_shadow_ext(self, name):
+    def remove_shadow_label(self, name):
+        """
+        Removes the '(Shadow)' label from a name.  This is necessary for IV lookup, because
+        when it comes to IVs, the best spread is the same--shadow or not.
+        """
         if type(name) != str:
             raise RuntimeError("Input name must be a string.")
         
@@ -645,24 +649,34 @@ class UIInfo (object):
         return name
     
 
-    def capitalize_name_ext(self, name):
+    def capitalize_form_label(self, name):
         """
-        Takes a lower case name and ensures any "()" tags are capitalized along
-        with the first letter.
+        Takes a lower case name and checks for a form label. If the name has a form label,
+        the form label will be properly capitalized along with the name.  If there is no
+        form label, the capitalized name is returned alone.
         """
-
         # Always capitalize first letter
         name = name.capitalize()
 
         indices = []
-        cur_index = 0
+        tag_start = 0
+        tag_end = 0
+        i_compound = 0
         while True:
-            cur_index = name.find("(", cur_index, len(name)-1)
-            if cur_index == -1:
+            tag_start = name.find("(", tag_start, len(name)-1)
+            if tag_start == -1:
                 break
-            cur_index += 1
-            if cur_index < len(name):
-                indices.append(cur_index)
+            tag_start += 1
+            if tag_start < len(name):
+                indices.append(tag_start)
+            tag_end = name.find(")", tag_start)
+
+            i_compound = tag_start
+            while i_compound != -1:
+                i_compound = name.find(" ", i_compound, tag_end)
+                if i_compound != -1 and i_compound + 1 < len(name):
+                    i_compound += 1
+                    indices.append(i_compound)
 
         if len(indices) == 0:
             return name
