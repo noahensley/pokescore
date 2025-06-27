@@ -7,4 +7,3 @@
 7. Touch up some entry and label padding.
 8. Clean up documentation using a documentation style of choice.
 9. 'Diff' moveset newlines are messed up.
-10. Best moveset not disappearing on a new, unfound search.
