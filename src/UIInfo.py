@@ -509,6 +509,8 @@ class UIInfo (object):
             return
         
         if not self.formatted_query_info['Found']:
+            self.do_show_all_ranks.set(False)
+            self.do_show_moveset.set(False)
             suggestions = ClassifyUtils.suggest_similar_names(self.formatted_query_info['Name'], self.csv_data)
             if suggestions:
                 self.display_suggestions(suggestions)
