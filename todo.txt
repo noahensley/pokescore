@@ -1,8 +1,10 @@
 1. Threads return OK when download fails.  This is because the threads simply start the download, not ensure the files appear.
 2. Add forms information allowing the user to "see different evos"
-3. Combine the search/lookup buttons into one. (Not sure I want to do this...)
 4. Newlines missing from multiple other leagues.  Fix that. (? Example)
 5. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
 6. Add a search_entry_status_label and replace the showwarning box with an ecode.
 7. Touch up some entry and label padding.
 8. Clean up documentation using a documentation style of choice.
+3. Combine the search/lookup buttons into one (Not sure if I want to do this...)
+    Good idea if the function for both checks the search entry contents for a different
+    query before performing a new query.  If it's the same, just do the iv_lookup.
