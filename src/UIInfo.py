@@ -538,7 +538,7 @@ class UIInfo (object):
                     cur_rank = other_leagues[league][0][0]
                     cur_score = other_leagues[league][0][1]
                     result_leagues_text += f"{league} League: Rank #{cur_rank} (Score: {cur_score})"
-                    if idx <= num_leagues - 1:
+                    if idx < num_leagues:
                         result_leagues_text += "\n" # Ensure no trailing newline
                     # Add current league best moveset (if different from best league moveset)
                     if self.do_show_moveset.get():
