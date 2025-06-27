@@ -6,4 +6,3 @@
 6. Add a search_entry_status_label and replace the showwarning box with an ecode.
 7. Touch up some entry and label padding.
 8. Clean up documentation using a documentation style of choice.
-9. 'Diff' moveset newlines are messed up.
