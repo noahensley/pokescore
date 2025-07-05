@@ -1,12 +1,12 @@
 1. Threads return OK when download fails.  This is because the threads simply start the download, not ensure the files appear.
-2. Add forms information allowing the user to "see different evos"
-3. Newlines missing from multiple other leagues.  Fix that. (? Example)
-4. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
-5. Add a search_entry_status_label and replace the showwarning box with an ecode.
-6. Touch up some entry and label padding.
-7. Clean up documentation using a documentation style of choice.
-8. Combine the search/lookup buttons into one (Not sure if I want to do this...)
+2. Add forms information allowing the user to search evolutions via a separate GUI window.
+3. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
+4. Add a search_entry_status_label and replace the showwarning box with an ecode.
+5. Touch up some entry and label padding.
+6. Clean up documentation using a documentation style of choice.
+7. Combine the search/lookup buttons into one (Not sure if I want to do this...)
     Good idea if the function for both checks the search entry contents for a different
     query before performing a new query.  If it's the same, just do the iv_lookup.
-9. Instead of deselecting the checkboxes on unfound query, maybe change how movesets/leagues display when not found.
+8. Instead of deselecting the checkboxes on unfound query, maybe change how movesets/leagues display when not found.
 	This is so you don't have to re-check the boxes after a bad query
+9. Generalize UIInfo class so that it can be used for the separate evolution GUI
