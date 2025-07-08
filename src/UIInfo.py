@@ -61,7 +61,7 @@ class UIInfo(object):
         self.download_frame = ttk.Frame(self.root, padding="5")
         # Labels
         self.search_label = ttk.Label(self.interface_frame, text="Enter Pokémon Name:", style='LargeBold.TLabel')
-        self.iv_label = ttk.Label(self.interface_frame, text="Enter IVs (e.g. 15,15,15):", foreground="dim gray", style='LargeBold.TLabel')
+        self.iv_label = ttk.Label(self.interface_frame, text="Enter IVs (e.g. 0,15,15):", foreground="dim gray", style='LargeBold.TLabel')
         self.iv_lookup_status_label = ttk.Label(self.interface_frame, text="", foreground="blue", style='Small.TLabel')
         self.result_header = ttk.Label(self.results_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
                                style='LargeBold.TLabel')
@@ -142,7 +142,7 @@ class UIInfo(object):
         self.search_label.grid(row=0, column=0, padx=1, pady=0, sticky=tk.W)
         self.iv_label.grid(row=1, column=0, padx=1, pady=0, sticky=tk.W)
         self.iv_lookup_status_label.grid(row=1, column=1, columnspan=2, padx=100, sticky=tk.W)
-        self.download_label.grid(row=0, column=1, padx=3, pady=0, sticky=tk.W) # row 0 of download_frame
+        self.download_label.grid(row=0, column=1, padx=0, pady=0, sticky=tk.W) # row 0 of download_frame
         self.result_header.grid(row=0, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E)) # rows 0...10 of results_frame
         self.suggestions_header.grid(row=0, column=0, columnspan=3, pady=(0,3), sticky=(tk.W, tk.E)) # 0 top padding, 3 bottom
         self.leagues_header.grid(row=0, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E))
@@ -155,8 +155,8 @@ class UIInfo(object):
         self.search_entry.grid(row=0, column=1, padx=1, pady=4, sticky=tk.W)
         self.iv_entry.grid(row=1, column=1, padx=1, pady=4, sticky=tk.W)
         # Buttons
-        self.search_button.grid(row=0, column=2, padx=5, pady=5, sticky=tk.W)
-        self.iv_lookup_button.grid(row=1, column=2, padx=5, pady=0, sticky=tk.W)
+        self.search_button.grid(row=0, column=2, padx=10, pady=5, sticky=tk.W)
+        self.iv_lookup_button.grid(row=1, column=2, padx=10, pady=0, sticky=tk.W)
         self.download_assets_button.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W) # row 0 of download_frame
         # Checkbuttons
         self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=2, pady=1, sticky=tk.W)

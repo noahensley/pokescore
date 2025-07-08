@@ -2,13 +2,12 @@
 2. Add forms information allowing the user to search evolutions via a separate GUI window.
 3. Some pokemon like urshifu have different forms that are not recognized by GOIV.app.  Not sure of a fix.
 4. Add a search_entry_status_label and replace the showwarning box with an ecode.
-5. Touch up some entry and label padding.
-6. Clean up documentation using a documentation style of choice.
-7. Combine the search/lookup buttons into one (Not sure if I want to do this...)
+5. Clean up documentation using a documentation style of choice.
+6. Combine the search/lookup buttons into one (Not sure if I want to do this...)
     Good idea if the function for both checks the search entry contents for a different
     query before performing a new query.  If it's the same, just do the iv_lookup.
-8. Instead of deselecting the checkboxes on unfound query, maybe change how movesets/leagues display when not found.
+7. Instead of deselecting the checkboxes on unfound query, maybe change how movesets/leagues display when not found.
 	This is so you don't have to re-check the boxes after a bad query
-9. Generalize UIInfo class so that it can be used for the separate evolution GUI
-10. Add a try-catch for the exit button being pressed during a download.
-11. Make the console output more user friendly.  Remove BTS statements and add status statements.
+8. Generalize UIInfo class so that it can be used for the separate evolution GUI
+9. Add a try-catch for the exit button being pressed during a download.
+10. Make the console output more user friendly.  Remove BTS statements and add status statements.
