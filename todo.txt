@@ -10,3 +10,8 @@
 8. Instead of deselecting the checkboxes on unfound query, maybe change how movesets/leagues display when not found.
 	This is so you don't have to re-check the boxes after a bad query
 9. Generalize UIInfo class so that it can be used for the separate evolution GUI
+10. Add a try-catch for the exit button being pressed during a download.
+11. Make the console output more user friendly.  Remove BTS statements and add status statements.
+12. The 'z' in 'porygon-z' is not capitalized.
+13. IV entry is focusable via tab button even when disabled.
+	The real problem is the IV label never un-graying?
