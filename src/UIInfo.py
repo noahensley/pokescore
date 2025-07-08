@@ -11,7 +11,7 @@ import WebInfo
 import re
 from utils import core
 
-class UIInfo (object):
+class UIInfo(object):
     
     def __init__(self):
 
@@ -713,8 +713,9 @@ class UIInfo (object):
 
     def capitalize_form_label(self, name):
         """
-        Checks the supplied name for a form label and properly capitalizes it AND the Pokémon name.  
-        If there is no form label, only the capitalized name is returned.
+        Checks the supplied name for a form label and properly capitalizes it AND the Pokémon name
+        (including hyphenated names).  If there is no form label, only the capitalized name is 
+        returned.
 
         :param name: The name to properly capitalize.
         """
@@ -722,9 +723,20 @@ class UIInfo (object):
         name = name.capitalize()
 
         indices = []
+        i_hyphen = 0
         tag_start = 0
         tag_end = 0
         i_compound = 0
+        # Search for hyphen can be done before tag, because no form labels
+        # include hyphens--I think.
+        while True:
+            i_hyphen = name.find("-", i_hyphen, len(name)-1)
+            if i_hyphen == -1:
+                break
+            i_hyphen += 1
+            if i_hyphen < len(name):
+                indices.append(i_hyphen)
+
         while True:
             tag_start = name.find("(", tag_start, len(name)-1)
             if tag_start == -1:

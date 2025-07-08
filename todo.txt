@@ -12,6 +12,5 @@
 9. Generalize UIInfo class so that it can be used for the separate evolution GUI
 10. Add a try-catch for the exit button being pressed during a download.
 11. Make the console output more user friendly.  Remove BTS statements and add status statements.
-12. The 'z' in 'porygon-z' is not capitalized.
-13. IV entry is focusable via tab button even when disabled.
+12. IV entry is focusable via tab button even when disabled.
 	The real problem is the IV label never un-graying?
