@@ -82,7 +82,7 @@ class UIInfo(object):
 
         self.download_label = ttk.Label(self.download_frame, text="", foreground="blue", style='Large.TLabel')
         # Entries
-        self.search_entry = ttk.Entry(self.interface_frame, width=25, font=('Arial', 12))
+        self.search_entry = ttk.Entry(self.interface_frame, width=18, font=('Arial', 12))
         self.iv_entry = ttk.Entry(self.interface_frame, width=10, font=('Arial', 12))
         # Buttons
         self.search_button = ttk.Button(self.interface_frame, text="Search", style='Large.TButton',
@@ -155,8 +155,8 @@ class UIInfo(object):
         self.search_entry.grid(row=0, column=1, padx=1, pady=4, sticky=tk.W)
         self.iv_entry.grid(row=1, column=1, padx=1, pady=4, sticky=tk.W)
         # Buttons
-        self.search_button.grid(row=0, column=2, padx=10, pady=5, sticky=tk.W)
-        self.iv_lookup_button.grid(row=1, column=2, padx=10, pady=0, sticky=tk.W)
+        self.search_button.grid(row=0, column=2, padx=(10,5), pady=5, sticky=tk.W)
+        self.iv_lookup_button.grid(row=1, column=2, padx=(10,5), pady=0, sticky=tk.W)
         self.download_assets_button.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W) # row 0 of download_frame
         # Checkbuttons
         self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=2, pady=1, sticky=tk.W)
