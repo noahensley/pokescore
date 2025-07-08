@@ -48,9 +48,9 @@ def load_data():
     try:
         # Import .csv rankings from pvpoke.com
         target_dir = relative_path(path_to_append="\\..\\data")
-        great_league = pd.read_csv(os.path.join(target_dir, 'cp1500_all_overall_rankings.csv'))
-        ultra_league = pd.read_csv(os.path.join(target_dir, 'cp2500_all_overall_rankings.csv'))
-        master_league = pd.read_csv(os.path.join(target_dir, 'cp10000_all_overall_rankings.csv'))
+        great_league = pd.read_csv(os.path.join(target_dir, 'cp1500_all_overall_rankings.csv'), encoding='utf-8')
+        ultra_league = pd.read_csv(os.path.join(target_dir, 'cp2500_all_overall_rankings.csv'), encoding='utf-8')
+        master_league = pd.read_csv(os.path.join(target_dir, 'cp10000_all_overall_rankings.csv'), encoding='utf-8')
 
         return {
             'great': great_league,
