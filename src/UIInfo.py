@@ -226,9 +226,7 @@ class UIInfo(object):
         self.search_entry.focus_set()
         self.search_entry.selection_range(0, tk.END)
 
-        # Enable IV Lookup
-        self.iv_entry.config(state=tk.NORMAL)
-        self.iv_lookup_button.config(state=tk.NORMAL)
+        # Reset IV label/entry if needed
         self.iv_lookup_status_label.config(text="") # Clear Success code
         self.iv_entry.delete(0, tk.END) # Clear IV input on new search
 
@@ -511,12 +509,15 @@ class UIInfo(object):
         if not self.formatted_query_info['Found']:
             self.do_show_all_ranks.set(False)
             self.do_show_moveset.set(False)
+            self.disable_iv_lookup()
             suggestions = ClassifyUtils.suggest_similar_names(self.formatted_query_info['Name'], self.csv_data)
             if suggestions:
                 self.display_suggestions(suggestions)
             else:
                 self.result_header.config(text=f"{self.formatted_query_info['Name']} not found in any league.")
             return
+        else:
+            self.enable_iv_lookup()
         
         result_header_text += (f"{self.formatted_query_info['Name']} is ranked {self.formatted_query_info['Rank']} "
         f"with a score of {self.formatted_query_info['Score']} in the {self.formatted_query_info['League']} League.")
@@ -761,5 +762,19 @@ class UIInfo(object):
             list_copy[i] = list_copy[i].upper()
 
         return "".join(list_copy)
+    
+    
+    def disable_iv_lookup(self):
+        self.iv_label.config(foreground="dim gray")
+        self.iv_entry.config(state=tk.DISABLED)
+        self.iv_lookup_button.config(state=tk.DISABLED)
+        #optional error code
 
+
+    def enable_iv_lookup(self):
+        self.iv_label.config(foreground="black") #Un-gray the text
+        self.iv_entry.config(state=tk.NORMAL)
+        self.iv_lookup_button.config(state=tk.NORMAL)
+        self.iv_lookup_status_label.config(text="") # Clear Success code
+        self.iv_entry.delete(0, tk.END) # Clear IV input on new search
 
