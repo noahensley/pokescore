@@ -61,6 +61,7 @@ class UIInfo(object):
         self.download_frame = ttk.Frame(self.root, padding="5")
         # Labels
         self.search_label = ttk.Label(self.interface_frame, text="Enter Pokémon Name:", style='LargeBold.TLabel')
+        self.search_status_label = ttk.Label(self.interface_frame, text="", foreground="blue", style='Small.TLabel')
         self.iv_label = ttk.Label(self.interface_frame, text="Enter IVs (e.g. 0,15,15):", foreground="dim gray", style='LargeBold.TLabel')
         self.iv_lookup_status_label = ttk.Label(self.interface_frame, text="", foreground="blue", style='Small.TLabel')
         self.result_header = ttk.Label(self.results_frame, text="", wraplength=500, justify=tk.LEFT, anchor=tk.W,
@@ -113,8 +114,10 @@ class UIInfo(object):
         
         # CONFIG
         # Frames
-        self.interface_frame.grid_columnconfigure(0, weight=0)  # Left-aligned elements (labels, checkboxes, bottom_frame) (?)
-        self.interface_frame.grid_columnconfigure(1, weight=1)  # Search entry (expanding)
+        self.interface_frame.grid_columnconfigure(0, weight=0) # Left-aligned elements (labels, checkboxes, bottom_frame) (?)
+        self.interface_frame.grid_columnconfigure(1, weight=0) # Search entry (expanding)
+        self.interface_frame.grid_columnconfigure(2, weight=0) # Error labels
+        self.interface_frame.grid_columnconfigure(3, weight=0) # search/lookup Buttons
         self.interface_frame.grid_rowconfigure(2, weight=0) # Checkbuttons
         self.interface_frame.grid_rowconfigure(3, weight=1)  # Push download_frame to the bottom
         self.results_frame.grid_columnconfigure(0, weight=1) # Frames stretch to the left
@@ -140,8 +143,9 @@ class UIInfo(object):
         self.download_frame.grid(row=6, column=0, columnspan=2, sticky=tk.SW)
         # Labels
         self.search_label.grid(row=0, column=0, padx=1, pady=0, sticky=tk.W)
+        self.search_status_label.grid(row=0, column=2, padx=5, sticky=tk.W)
         self.iv_label.grid(row=1, column=0, padx=1, pady=0, sticky=tk.W)
-        self.iv_lookup_status_label.grid(row=1, column=1, columnspan=2, padx=100, sticky=tk.W)
+        self.iv_lookup_status_label.grid(row=1, column=2, padx=5, sticky=tk.W)
         self.download_label.grid(row=0, column=1, padx=0, pady=0, sticky=tk.W) # row 0 of download_frame
         self.result_header.grid(row=0, column=0, columnspan=3, pady=0, sticky=(tk.W, tk.E)) # rows 0...10 of results_frame
         self.suggestions_header.grid(row=0, column=0, columnspan=3, pady=(0,3), sticky=(tk.W, tk.E)) # 0 top padding, 3 bottom
@@ -155,8 +159,8 @@ class UIInfo(object):
         self.search_entry.grid(row=0, column=1, padx=1, pady=4, sticky=tk.W)
         self.iv_entry.grid(row=1, column=1, padx=1, pady=4, sticky=tk.W)
         # Buttons
-        self.search_button.grid(row=0, column=2, padx=(10,5), pady=5, sticky=tk.W)
-        self.iv_lookup_button.grid(row=1, column=2, padx=(10,5), pady=0, sticky=tk.W)
+        self.search_button.grid(row=0, column=3, padx=(10,5), pady=5, sticky=tk.E)
+        self.iv_lookup_button.grid(row=1, column=3, padx=(10,5), pady=0, sticky=tk.E)
         self.download_assets_button.grid(row=0, column=0, padx=5, pady=5, sticky=tk.W) # row 0 of download_frame
         # Checkbuttons
         self.show_all_ranks_checkbox.grid(row=2, column=0, columnspan=2, pady=1, sticky=tk.W)
@@ -179,8 +183,12 @@ class UIInfo(object):
         supplied_name = self.search_entry.get().strip().lower()
 
         if not supplied_name:
-            messagebox.showwarning("Input Error", "Please enter a Pokémon.")
+            self.display_ecode(msg="Please enter a Pokémon.", color="red2", row=0)
+            self.disable_iv_lookup()
             return
+        
+        # Clear search error on query entry
+        self.clear_ecode(row=0)
 
         # Clear previous search results
         self.result_header.config(text="")
@@ -227,7 +235,7 @@ class UIInfo(object):
         self.search_entry.selection_range(0, tk.END)
 
         # Reset IV label/entry if needed
-        self.iv_lookup_status_label.config(text="") # Clear Success code
+        self.clear_ecode(row=1)
         self.iv_entry.delete(0, tk.END) # Clear IV input on new search
 
 
@@ -243,21 +251,18 @@ class UIInfo(object):
         match = re.search(core.iv_pattern, ivs)
 
         if not match:
-            self.iv_lookup_status_label.config(text="Invalid IV Format.", foreground="red2")
-            self.iv_entry.focus_set()
-            self.iv_entry.selection_range(0, tk.END)
+            self.display_ecode(msg="Invalid IV Format.", color="red2", row=1)
             return
 
         if name == "":
-            self.iv_lookup_status_label.config(text="Please enter a Pokemon name.", foreground="red2")
-            self.search_entry.focus_set()
+            self.display_ecode(msg="Please enter a Pokémon.", color="red2", row=0)
             return
 
         ivs = [item.strip() for item in ivs.split(",")]
 
         if self.web_iv_info != None:
             if ivs == [self.web_iv_info.attack_iv, self.web_iv_info.defense_iv, self.web_iv_info.stamina_iv] and name == self.web_iv_info.pokemon_name:
-                self.iv_lookup_status_label.config(text="IVs already displayed.", foreground="blue")
+                self.display_ecode(msg="IVs already displayed.", color="blue", row=1)
                 return
 
         self.web_iv_info.pokemon_name = self.capitalize_form_label(name)
@@ -266,12 +271,10 @@ class UIInfo(object):
         self.web_iv_info.stamina_iv = ivs[2]
 
         if self.web_iv_info.fetch_ivs() == False:
-            self.iv_lookup_status_label.config(text="Could not find Pokemon.", foreground="red2")
-            self.search_entry.focus_set()
-            self.iv_entry.selection_range(0, tk.END)
+            self.display_ecode(msg="No IV data found.", color="red2", row=1)
             return
         
-        self.iv_lookup_status_label.config(text="Success", foreground="blue")
+        self.display_ecode(msg="Success", color="blue", row=1)
         # Copy the results to the UIInfo in ascending order
         self.local_iv_rankings = dict(sorted(self.web_iv_info.ranks.items(), key=lambda item: int(item[1])))
         self.populate_results()
@@ -775,6 +778,33 @@ class UIInfo(object):
         self.iv_label.config(foreground="black") #Un-gray the text
         self.iv_entry.config(state=tk.NORMAL)
         self.iv_lookup_button.config(state=tk.NORMAL)
-        self.iv_lookup_status_label.config(text="") # Clear Success code
         self.iv_entry.delete(0, tk.END) # Clear IV input on new search
+
+    
+    def display_ecode(self, msg, color="red2", row=None):
+        if row == None:
+            raise RuntimeError("Must specify error row number.")
+
+        if row == 0:
+            # search error
+            self.search_status_label.config(text=msg, foreground=color)
+            self.search_entry.focus_set()
+            self.search_entry.selection_range(0, tk.END)
+        elif row == 1:
+            # lookup error
+            self.iv_lookup_status_label.config(text=msg, foreground=color)
+            self.iv_entry.focus_set()
+            self.iv_entry.selection_range(0, tk.END)
+
+
+    def clear_ecode(self, row=None):
+        if row == None: 
+            raise RuntimeError("Must specify error row to clear.")
+        
+        if row == 0:
+            self.search_status_label.config(text="")
+        elif row == 1:
+            self.iv_lookup_status_label.config(text="")
+
+        
 
