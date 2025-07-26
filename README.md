@@ -1,8 +1,8 @@
-# Pok‚score
+# Pokescore
 
 ### What is this repository for?
 
-* Pok‚score Software Application
+* Pokescore Software Application
 * 1.0.0
 
 ### How do I get set up?
