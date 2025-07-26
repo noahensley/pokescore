@@ -10,3 +10,4 @@
 7. Generalize UIInfo class so that it can be used for the separate evolution GUI
 8. Add a try-catch for the exit button being pressed during a download.
 9. Make the console output more user friendly.  Remove BTS statements and add status statements.
+10. A timeout during IV lookup results in old IV rankings being displayed.  Fix that.
