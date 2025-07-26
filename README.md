@@ -1,7 +1,7 @@
-# PokScore
+# Pokéscore
 
 What is this repository for?
-* PokScore Project
+* Pokéscore Project
 * 1.0.0
 
 How do I get set up?
@@ -12,7 +12,7 @@ How do I get set up?
    * selenium
    * webdriver-manager
    * tkinter (included with Python)
-* Chrome browser required for web scraping functionality
+* Chrome browser v75+ required for web scraping functionality
 * How to run tests (still needed)
 * Use 'pip install -r requirements.txt' **dependencies** prior to building.
 
