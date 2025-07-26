@@ -1,29 +1,28 @@
-# README #
+# PokScore
 
-This README would normally document whatever steps are necessary to get your application up and running.
+What is this repository for?
+* PokScore Project
+* 1.0.0
 
-### What is this repository for? ###
+How do I get set up?
+* Relies on Python 3.7+
+* Windows (tested), Linux/Mac (should work)
+* Dependencies:
+   * pandas
+   * selenium
+   * webdriver-manager
+   * tkinter (included with Python)
+* Chrome browser required for web scraping functionality
+* How to run tests (still needed)
+* Use 'pip install -r requirements.txt' **dependencies** prior to building.
 
-* Quick summary
-* Version
-* [Learn Markdown](https://bitbucket.org/tutorials/markdowndemo)
+How to build executable:
+* Run `build.bat` after installing dependencies
+* Executable will be created in `dist/` folder
 
-### How do I get set up? ###
+Contribution guidelines
+* Writing tests (still needed)
+* Code review (closed, needs tests)
 
-* Summary of set up
-* Configuration
-* Dependencies
-* Database configuration
-* How to run tests
-* Deployment instructions
-
-### Contribution guidelines ###
-
-* Writing tests
-* Code review
-* Other guidelines
-
-### Who do I talk to? ###
-
+Who do I talk to?
 * Repo owner or admin
-* Other community or team contact
