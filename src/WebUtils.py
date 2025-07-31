@@ -4,15 +4,16 @@ import os.path
 # sys.path.append(os.path.dirname(os.path.abspath(__file__)))
 
 from selenium import webdriver
+from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
-from selenium.webdriver.common.keys import Keys
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 import threading
 import time
 import re
 from pathlib import Path
+import subprocess
 
 base_path = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
 sys.path.append(str(base_path))
@@ -88,5 +89,27 @@ def fetch_csv(q, src, dst):
         if 'driver' in locals():
             driver.quit()  # Ensures cleanup even if an error occurs
 
+
+def silent_driver_startup(options, driver):
+    # Disable automation indicators
+    options.add_experimental_option('useAutomationExtension', False)
+    options.add_experimental_option("excludeSwitches", ["enable-automation"])
+    
+    # Create service that redirects all output to devnull
+    service = Service()
+    service.creation_flags = subprocess.CREATE_NO_WINDOW if os.name == 'nt' else 0
+    
+    # Completely suppress output by redirecting at process level
+    with open(os.devnull, 'w') as devnull:
+        original_stdout = sys.stdout
+        original_stderr = sys.stderr
+        sys.stdout = devnull
+        sys.stderr = devnull
+        
+        try:
+            driver = webdriver.Chrome(service=service, options=options)
+        finally:
+            sys.stdout = original_stdout
+            sys.stderr = original_stderr
 
     
