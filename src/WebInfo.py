@@ -1,10 +1,10 @@
-from selenium import webdriver
 from selenium.webdriver.chrome.options import Options
 from selenium.webdriver.common.by import By
 from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
+from WebUtils import silent_driver_startup
 
 
 class WebInfo (object):
@@ -18,22 +18,19 @@ class WebInfo (object):
             raise RuntimeError("Must provide three IV fields.")
         
         try:
-            # Initialize webdriver
             self.chrome_options = Options()
-            self.chrome_options.add_argument("--headless=new")
-            self.chrome_options.add_argument("--disable-usb-discovery")
-            self.chrome_options.add_argument("--disable-device-discovery-notifications")
+            self.chrome_options.add_argument("--headless=chrome")
+            self.chrome_options.add_argument("--disable-extensions")   
             self.chrome_options.add_experimental_option("prefs", {
-                "download.prompt_for_download": False,  # Auto-download files
+                "download.prompt_for_download": False,
                 "download.directory_upgrade": True,
-                "safebrowsing.enabled": True,
-                "profile.managed_default_content_settings.images": 2,  # 2 = block images
-                "profile.managed_default_content_settings.media_stream": 2,  # block media streams (mic/cam)
-                "profile.managed_default_content_settings.plugins": 2,  # block plugins (like flash)
-                "profile.managed_default_content_settings.javascript": 1,  # 1 = allow JS (usually want on)
+                "safebrowsing.enabled": True
             })
-            self.driver = webdriver.Chrome(options=self.chrome_options)
+            
+            self.driver = None
+            silent_driver_startup(self.chrome_options, self.driver)       
             self.wait = WebDriverWait(self.driver, 10)
+
             self.pokemon_name = name
             if ivs != None:
                 self.attack_iv = ivs[0]
