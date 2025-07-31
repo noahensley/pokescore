@@ -11,17 +11,24 @@ import WebInfo
 import re
 from utils import core
 
+
 class UIInfo(object):
     
     def __init__(self):
 
-        self.csv_data = FileUtils.load_data()
-        self.suggestion_buttons = []
-        self.except_queue = queue.Queue(maxsize=3)
-        self.formatted_query_info = {}
-        self.local_iv_rankings = {}
-        self.web_iv_info = WebInfo.WebInfo()
-        self.previous_label_color = {}
+        print("[UIInfo] Initializing...")
+        try:
+            self.csv_data = FileUtils.load_data()       
+            self.suggestion_buttons = []
+            self.except_queue = queue.Queue(maxsize=3)
+            self.formatted_query_info = {}
+            self.local_iv_rankings = {}
+            self.web_iv_info = WebInfo.WebInfo()
+            self.previous_label_color = {}
+
+        except Exception as e:
+            print("[UIInfo] ERROR")
+            raise RuntimeError(f"Unable to initialize UIInfo: {e}")
 
         # ROOT
         self.root = tk.Tk()
@@ -173,6 +180,8 @@ class UIInfo(object):
         # Allow user to press 'Enter' to search
         self.root.bind('<Return>', self.handle_enter_press)
         self.root.bind('<Tab>', self.handle_tab_press)
+        print("[UIInfo] DONE")
+        FileUtils.clear_terminal()
         self.root.mainloop()
 
 

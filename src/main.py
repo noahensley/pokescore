@@ -7,4 +7,8 @@ import UIInfo
 
 # Main program
 if __name__ == "__main__":
-    ui = UIInfo.UIInfo()
+    try:
+        ui = UIInfo.UIInfo()
+    except RuntimeError as e:
+        print(f"ERROR: {e}\nExiting...")
+        exit()

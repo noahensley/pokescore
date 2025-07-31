@@ -4,6 +4,7 @@ import time
 import re
 from tkinter import messagebox
 import pandas as pd
+import platform
 
 from pathlib import Path
 
@@ -58,5 +59,9 @@ def load_data():
             'master': master_league
         }
     except FileNotFoundError as e:
-        messagebox.showerror("File Not Found", f"Could not find file: {e.filename}")
-        exit()
+        raise FileNotFoundError(f"File Not Found: {e.filename}")
+    
+
+def clear_terminal():
+    time.sleep(1)
+    os.system('cls' if platform.system() == 'Windows' else 'clear')

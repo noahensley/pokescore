@@ -17,6 +17,7 @@ class WebInfo (object):
         if ivs != None and len(ivs) != 3:
             raise RuntimeError("Must provide three IV fields.")
         
+        print("[WebInfo] Initializing...")
         try:
             self.chrome_options = Options()
             self.chrome_options.add_argument("--headless=chrome")
@@ -43,11 +44,14 @@ class WebInfo (object):
             self.ranks = {}
 
         except Exception as e:
-            print(f"Unexpected error: {e}")
+            print("[WebInfo] ERROR")
+            raise RuntimeError(f"Unable to initialize WebInfo: {e}")
 
         finally:
             if 'self.driver' in locals():
                 self.driver.quit()  # Ensures cleanup even if an error occurs
+
+        print("[WebInfo] DONE")
 
 
     def fetch_ivs(self):
