@@ -90,7 +90,7 @@ def fetch_csv(q, src, dst):
             driver.quit()  # Ensures cleanup even if an error occurs
 
 
-def silent_driver_startup(options, driver):
+def silent_driver_startup(options):
     # Disable automation indicators
     options.add_experimental_option('useAutomationExtension', False)
     options.add_experimental_option("excludeSwitches", ["enable-automation"])
@@ -112,4 +112,5 @@ def silent_driver_startup(options, driver):
             sys.stdout = original_stdout
             sys.stderr = original_stderr
 
+    return driver
     

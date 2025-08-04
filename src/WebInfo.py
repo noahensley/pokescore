@@ -28,8 +28,7 @@ class WebInfo (object):
                 "safebrowsing.enabled": True
             })
             
-            self.driver = None
-            silent_driver_startup(self.chrome_options, self.driver)       
+            self.driver = silent_driver_startup(self.chrome_options)       
             self.wait = WebDriverWait(self.driver, 10)
 
             self.pokemon_name = name
