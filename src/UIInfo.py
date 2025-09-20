@@ -274,7 +274,7 @@ class UIInfo(object):
                 self.display_ecode(msg="IVs already displayed.", color="blue", row=1)
                 return
 
-        self.web_iv_info.pokemon_name = self.capitalize_form_label(name)
+        self.web_iv_info.pokemon_name = name.title()
         self.web_iv_info.attack_iv = ivs[0]
         self.web_iv_info.defense_iv = ivs[1]
         self.web_iv_info.stamina_iv = ivs[2]
@@ -646,7 +646,7 @@ class UIInfo(object):
                 best_score = cur_score
                 best_league = league
 
-        query_name = self.capitalize_form_label(query_name)
+        query_name = query_name.title()
         self.formatted_query_info['Name'] = query_name # This is needed even if not found (best_league == None)
         if best_league:
             best_moveset = all_leagues[best_league][1]
@@ -722,58 +722,6 @@ class UIInfo(object):
             return name[:index]
         
         return name
-    
-
-    def capitalize_form_label(self, name):
-        """
-        Checks the supplied name for a form label and properly capitalizes it AND the Pokémon name
-        (including hyphenated names).  If there is no form label, only the capitalized name is 
-        returned.
-
-        :param name: The name to properly capitalize.
-        """
-        # Always capitalize first letter
-        name = name.capitalize()
-
-        indices = []
-        i_hyphen = 0
-        tag_start = 0
-        tag_end = 0
-        i_compound = 0
-        # Search for hyphen can be done before tag, because no form labels
-        # include hyphens--I think.
-        while True:
-            i_hyphen = name.find("-", i_hyphen, len(name)-1)
-            if i_hyphen == -1:
-                break
-            i_hyphen += 1
-            if i_hyphen < len(name):
-                indices.append(i_hyphen)
-
-        while True:
-            tag_start = name.find("(", tag_start, len(name)-1)
-            if tag_start == -1:
-                break
-            tag_start += 1
-            if tag_start < len(name):
-                indices.append(tag_start)
-            tag_end = name.find(")", tag_start)
-
-            i_compound = tag_start
-            while i_compound != -1:
-                i_compound = name.find(" ", i_compound, tag_end)
-                if i_compound != -1 and i_compound + 1 < len(name):
-                    i_compound += 1
-                    indices.append(i_compound)
-
-        if len(indices) == 0:
-            return name
-
-        list_copy = list(name)
-        for i in indices:
-            list_copy[i] = list_copy[i].upper()
-
-        return "".join(list_copy)
     
     
     def disable_iv_lookup(self):
