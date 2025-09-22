@@ -1,4 +1,4 @@
-LENGTH_DIFF_MAX = 5
+LENGTH_DIFF_MAX = 3
 
 def names_are_similar(n_longest, n_equalized, ch_error, len_error):
     """
@@ -10,23 +10,29 @@ def names_are_similar(n_longest, n_equalized, ch_error, len_error):
     :param len_error: The maximum allowable length difference.
     :return: True if names are similar; False otherwise.
     """
-    # Check for a length difference exceeding 3--excluding "()" tags
-    len_longest_no_tags = len(n_longest.split( "("[0]))
-    len_equalized_no_padding = len(n_equalized.split(".")[0])
-    if n_longest == "palkia":
-        pass                               
+    # Check for a length difference exceeding LENGTH_DIFF_MAX--excluding "()" tags
+    len_longest_no_tags = len(n_longest)
+    if "(" in n_longest:
+        len_longest_no_tags = len(n_longest.split(" ("[0]))
+    len_equalized_no_padding = len(n_equalized)
+    if "." in n_equalized:
+        len_equalized_no_padding = len(n_equalized.split(".")[0])    
+
     if abs(len_longest_no_tags - len_equalized_no_padding) > len_error:
         return False
     
     # Check a character difference exceeding error
     diff = 0
-    for i in range(0, len(n_longest)):
+    for i in range(0, len_longest_no_tags):
         if n_longest[i] != n_equalized[i]:
             diff += 1
             # Prevents jumbled letters from decreasing 'diff' score
-            if n_equalized[i] in n_longest:
-                diff -= 1
-        
+            try:
+                if n_equalized[i-2:i+1] in n_longest:
+                    diff -= 1
+            except Exception as e:
+                pass # index out of range
+              
         # Exit early
         if diff > ch_error:
             return False
@@ -77,7 +83,6 @@ def suggest_similar_names(pokemon_name, data):
             # Format both name boths to lower-case for comparison
             data_name = name.lower()
             supplied_name = pokemon_name.lower()
-
             # Equalize the longest and shortest names
             longest_name, equalized_name = equalize_names(supplied_name, data_name)
             shortest_name = equalized_name.split(".")[0]
