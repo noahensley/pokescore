@@ -1,17 +1,21 @@
-
+LENGTH_DIFF_MAX = 5
 
 def names_are_similar(n_longest, n_equalized, ch_error, len_error):
     """
     Check if two names are similar based on character and length differences.
 
     :param n_longest: The longer name.
-    :param n_equalized: The equalized name for comparison.
+    :param n_equalized: The other name padded with periods for comparison.
     :param ch_error: The maximum allowable character difference.
     :param len_error: The maximum allowable length difference.
     :return: True if names are similar; False otherwise.
     """
     # Check for a length difference exceeding 3--excluding "()" tags
-    if abs(len(n_longest.split(" (")[0]) - len(n_equalized.split(".")[0])) > len_error:
+    len_longest_no_tags = len(n_longest.split( "("[0]))
+    len_equalized_no_padding = len(n_equalized.split(".")[0])
+    if n_longest == "palkia":
+        pass                               
+    if abs(len_longest_no_tags - len_equalized_no_padding) > len_error:
         return False
     
     # Check a character difference exceeding error
@@ -19,6 +23,9 @@ def names_are_similar(n_longest, n_equalized, ch_error, len_error):
     for i in range(0, len(n_longest)):
         if n_longest[i] != n_equalized[i]:
             diff += 1
+            # Prevents jumbled letters from decreasing 'diff' score
+            if n_equalized[i] in n_longest:
+                diff -= 1
         
         # Exit early
         if diff > ch_error:
@@ -63,7 +70,7 @@ def suggest_similar_names(pokemon_name, data):
     """
     suggestions = set() 
     ch_error = len(pokemon_name) * 0.5
-    len_error = 3
+    len_error = LENGTH_DIFF_MAX
 
     for league in data.values():
         for name in league["Pokemon"]:
