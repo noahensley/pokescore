@@ -185,10 +185,14 @@ class UIInfo(object):
         self.root.mainloop()
 
 
-    def query_csv_data(self):
+    def query_csv_data(self, is_suggestion=False):
         """
         Search for a Pokémon in the CSV dataset and assign results to 'formatted_query_info' attribute.
         """
+        if is_suggestion:
+            self.do_show_all_ranks.set(self.prev_show_ranks_bool)
+            self.do_show_moveset.set(self.prev_show_moveset_bool)
+         
         supplied_name = self.search_entry.get().strip().lower()
 
         if not supplied_name:
@@ -312,7 +316,7 @@ class UIInfo(object):
             button = ttk.Button(
                 self.suggestions_frame,  # Parent widget
                 text=name,
-                command=lambda n=name: self.search_entry.delete(0, tk.END) or self.search_entry.insert(0, n) or self.query_csv_data()
+                command=lambda n=name: self.search_entry.delete(0, tk.END) or self.search_entry.insert(0, n) or self.query_csv_data(True)
             )
             button.grid(row=idx + 1, column=0, columnspan=3, pady=5, padx=10, sticky=tk.EW)  # +1 to avoid row 0 conflict (suggestion frame)
             self.suggestion_buttons.append(button)  # Track the button
@@ -519,6 +523,9 @@ class UIInfo(object):
             return
         
         if not self.formatted_query_info['Found']:
+            self.prev_show_ranks_bool = self.do_show_all_ranks.get()
+            self.prev_show_moveset_bool = self.do_show_moveset.get()
+            # Disable optional information display
             self.do_show_all_ranks.set(False)
             self.do_show_moveset.set(False)
             self.disable_iv_lookup()
