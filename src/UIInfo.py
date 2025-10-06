@@ -25,6 +25,8 @@ class UIInfo(object):
             self.local_iv_rankings = {}
             self.web_iv_info = WebInfo.WebInfo()
             self.previous_label_color = {}
+            self.prev_show_moveset_bool = False
+            self.prev_show_ranks_bool = False
 
         except Exception as e:
             print("[UIInfo] ERROR")
@@ -185,13 +187,16 @@ class UIInfo(object):
         self.root.mainloop()
 
 
-    def query_csv_data(self, is_suggestion=False):
+    def query_csv_data(self):
         """
         Search for a Pokémon in the CSV dataset and assign results to 'formatted_query_info' attribute.
         """
-        if is_suggestion:
-            self.do_show_all_ranks.set(self.prev_show_ranks_bool)
+        # Fill checkboxes if they were filled before the query
+        #   because bad query unchecks them
+        if self.prev_show_moveset_bool:
             self.do_show_moveset.set(self.prev_show_moveset_bool)
+        if self.prev_show_ranks_bool:
+            self.do_show_all_ranks.set(self.prev_show_ranks_bool)
          
         supplied_name = self.search_entry.get().strip().lower()
 
@@ -316,7 +321,7 @@ class UIInfo(object):
             button = ttk.Button(
                 self.suggestions_frame,  # Parent widget
                 text=name,
-                command=lambda n=name: self.search_entry.delete(0, tk.END) or self.search_entry.insert(0, n) or self.query_csv_data(True)
+                command=lambda n=name: self.search_entry.delete(0, tk.END) or self.search_entry.insert(0, n) or self.query_csv_data()
             )
             button.grid(row=idx + 1, column=0, columnspan=3, pady=5, padx=10, sticky=tk.EW)  # +1 to avoid row 0 conflict (suggestion frame)
             self.suggestion_buttons.append(button)  # Track the button
