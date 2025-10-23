@@ -29,8 +29,7 @@ class UIInfo(object):
         self.formatted_query_info = {}
         self.local_iv_rankings = {}     
         self.previous_label_color = {}
-        self.prev_show_moveset_bool = False
-        self.prev_show_ranks_bool = False
+        self.show_checkbox_results = True
 
         # ROOT
         self.root = tk.Tk()
@@ -193,10 +192,10 @@ class UIInfo(object):
         """
         # Fill checkboxes if they were filled before the query
         #   because bad query unchecks them.
-        if self.prev_show_moveset_bool:
-            self.do_show_moveset.set(True)
-        if self.prev_show_ranks_bool:
-            self.do_show_all_ranks.set(True)
+        #if self.prev_show_moveset_bool:
+            #self.do_show_moveset.set(True)
+        #if self.prev_show_ranks_bool:
+            #self.do_show_all_ranks.set(True)
          
         supplied_name = self.search_entry.get().strip().lower()
 
@@ -528,11 +527,10 @@ class UIInfo(object):
             return
         
         if not self.formatted_query_info['Found']:
-            self.prev_show_ranks_bool = self.do_show_all_ranks.get()
-            self.prev_show_moveset_bool = self.do_show_moveset.get()
+            self.show_checkbox_results = False
             # Disable optional information display
-            self.do_show_all_ranks.set(False)
-            self.do_show_moveset.set(False)
+            #self.do_show_all_ranks.set(False)
+            #self.do_show_moveset.set(False)
             self.disable_iv_lookup()
             suggestions = suggest_similar_names(self.formatted_query_info['Name'], self.csv_data)
             if suggestions:
@@ -541,6 +539,7 @@ class UIInfo(object):
                 self.result_header.config(text=f"{self.formatted_query_info['Name']} not found in any league.")
             return
         else:
+            self.show_checkbox_results = True
             self.enable_iv_lookup()
         
         result_header_text += (f"{self.formatted_query_info['Name']} is ranked {self.formatted_query_info['Rank']} "
@@ -554,7 +553,7 @@ class UIInfo(object):
         Pokémon was found in any other leagues or not.
         """
         result_leagues_text = ""
-        if self.do_show_all_ranks.get():
+        if self.do_show_all_ranks.get() and self.show_checkbox_results:
             if self.formatted_query_info['Other Leagues']:
                 self.leagues_header.config(text="Other Leagues:")
                 other_leagues = self.formatted_query_info['Other Leagues']
@@ -566,7 +565,7 @@ class UIInfo(object):
                     if idx < num_leagues:
                         result_leagues_text += "\n" # Ensure no trailing newline
                     # Add current league best moveset (if different from best league moveset)
-                    if self.do_show_moveset.get():
+                    if self.do_show_moveset.get() and self.show_checkbox_results:
                         alt_moveset = other_leagues[league][1].values()
                         shown_moveset = self.formatted_query_info['Best Moveset'].values()
                         if sorted(alt_moveset) != sorted(shown_moveset):
@@ -597,7 +596,7 @@ class UIInfo(object):
         Populates both the 'moveset' label and information frame.  The label is merely a header where the
         information frame will contain the best moveset for the queried Pokémon.
         """
-        if self.do_show_moveset.get():
+        if self.do_show_moveset.get() and self.show_checkbox_results:
             self.moveset_header.config(text="Best Moveset:")
             best_moveset = self.formatted_query_info['Best Moveset']
             result_moveset_text = (f"{best_moveset['Fast']}, {best_moveset['Charged1']}, "
