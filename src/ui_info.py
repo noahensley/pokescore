@@ -1,15 +1,14 @@
 import tkinter as tk
 from tkinter import ttk
-from tkinter import messagebox
-from WebUtils import initialize_fetch_csv
 import threading
 import queue
-import FileInfo
-import FileUtils
-import ClassifyUtils
-import WebInfo
 import re
+from file_info import FileInfo
+from web_info import WebInfo
 from utils import core
+from web_utils import initialize_fetch_csv
+from file_utils import load_data, clear_terminal
+from classify_utils import suggest_similar_names
 
 
 class UIInfo(object):
@@ -18,19 +17,19 @@ class UIInfo(object):
 
         print("[UIInfo] Initializing...")
         try:
-            self.csv_data = FileUtils.load_data()       
-            self.suggestion_buttons = []
-            self.except_queue = queue.Queue(maxsize=3)
-            self.formatted_query_info = {}
-            self.local_iv_rankings = {}
-            self.web_iv_info = WebInfo.WebInfo()
-            self.previous_label_color = {}
-            self.prev_show_moveset_bool = False
-            self.prev_show_ranks_bool = False
-
+            self.csv_data = load_data()
+            self.web_iv_info = WebInfo()    
         except Exception as e:
             print("[UIInfo] ERROR")
             raise RuntimeError(f"Unable to initialize UIInfo: {e}")
+         
+        self.suggestion_buttons = []
+        self.except_queue = queue.Queue(maxsize=3)
+        self.formatted_query_info = {}
+        self.local_iv_rankings = {}     
+        self.previous_label_color = {}
+        self.prev_show_moveset_bool = False
+        self.prev_show_ranks_bool = False
 
         # ROOT
         self.root = tk.Tk()
@@ -183,7 +182,7 @@ class UIInfo(object):
         self.root.bind('<Return>', self.handle_enter_press)
         self.root.bind('<Tab>', self.handle_tab_press)
         print("[UIInfo] DONE")
-        FileUtils.clear_terminal()
+        clear_terminal()
         self.root.mainloop()
 
 
@@ -412,10 +411,10 @@ class UIInfo(object):
             Performs the CSV file download and displays the status on the user interface.
             """
             try:
-                file_info = FileInfo.FileInfo()
-                file_info.make_data_backup()
+                f_info = FileInfo()
+                f_info.make_data_backup()
 
-                initialize_fetch_csv(self.except_queue, file_info)
+                initialize_fetch_csv(self.except_queue, f_info)
 
                 # Wait for threads to finish
                 while not self.except_queue.full():
@@ -426,18 +425,18 @@ class UIInfo(object):
                     ecode = self.except_queue.get()
                     if ecode != None:
                         self.download_label.config(text=f"Download failed.", foreground="red2")
-                        file_info.restore_data_backup()
+                        f_info.restore_data_backup()
                         return
 
                 # Ensures required files are present
-                if not file_info.downloads_successful():
+                if not f_info.downloads_successful():
                     self.download_label.config(text=f"Download failed.", foreground="red2")
-                    file_info.restore_data_backup()
+                    f_info.restore_data_backup()
                     return
 
-                self.csv_data = FileUtils.load_data()
+                self.csv_data = load_data()
                 self.download_label.config(text=f"Download complete.")
-                file_info.discard_backup()
+                f_info.discard_backup()
 
             except Exception as e:
                 self.download_label.config(text=f"Error: {e}", foreground="red2")
@@ -534,7 +533,7 @@ class UIInfo(object):
             self.do_show_all_ranks.set(False)
             self.do_show_moveset.set(False)
             self.disable_iv_lookup()
-            suggestions = ClassifyUtils.suggest_similar_names(self.formatted_query_info['Name'], self.csv_data)
+            suggestions = suggest_similar_names(self.formatted_query_info['Name'], self.csv_data)
             if suggestions:
                 self.display_suggestions(suggestions)
             else:

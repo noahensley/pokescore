@@ -1,17 +1,15 @@
-import os
 import sys
-import time
-import re
-from tkinter import messagebox
-import pandas as pd
-import platform
-
 from pathlib import Path
 
 base_path = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
 sys.path.append(str(base_path))
 sys.path.append(str(base_path.parent))
 
+import os
+import time
+import re
+import pandas as pd
+import platform
 from utils import core
 
 

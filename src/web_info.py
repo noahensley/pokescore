@@ -4,7 +4,7 @@ from selenium.webdriver.support.ui import WebDriverWait
 from selenium.webdriver.support import expected_conditions as EC
 from selenium.common.exceptions import NoSuchElementException
 from selenium.webdriver.support.ui import Select
-from WebUtils import silent_driver_startup
+from web_utils import silent_driver_startup
 
 
 class WebInfo (object):

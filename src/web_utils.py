@@ -1,8 +1,11 @@
 import sys
-import os.path
+from pathlib import Path
 
-# sys.path.append(os.path.dirname(os.path.abspath(__file__)))
+base_path = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
+sys.path.append(str(base_path))
+sys.path.append(str(base_path.parent))
 
+import os
 from selenium import webdriver
 from selenium.webdriver.chrome.service import Service
 from selenium.webdriver.chrome.options import Options
@@ -12,12 +15,7 @@ from selenium.webdriver.support import expected_conditions as EC
 import threading
 import time
 import re
-from pathlib import Path
 import subprocess
-
-base_path = Path(__file__).resolve().parent if '__file__' in globals() else Path.cwd()
-sys.path.append(str(base_path))
-sys.path.append(str(base_path.parent))
 
 from utils import core
 
