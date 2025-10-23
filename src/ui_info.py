@@ -192,11 +192,11 @@ class UIInfo(object):
         Search for a Pokémon in the CSV dataset and assign results to 'formatted_query_info' attribute.
         """
         # Fill checkboxes if they were filled before the query
-        #   because bad query unchecks them
+        #   because bad query unchecks them.
         if self.prev_show_moveset_bool:
-            self.do_show_moveset.set(self.prev_show_moveset_bool)
+            self.do_show_moveset.set(True)
         if self.prev_show_ranks_bool:
-            self.do_show_all_ranks.set(self.prev_show_ranks_bool)
+            self.do_show_all_ranks.set(True)
          
         supplied_name = self.search_entry.get().strip().lower()
 
