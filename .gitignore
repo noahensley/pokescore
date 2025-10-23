@@ -10,6 +10,9 @@
 # CSV files
 data/*.csv
 
+# Temp workspaces
+/.vscode-temp/
+
 # Node artifact files
 node_modules/
 dist/
