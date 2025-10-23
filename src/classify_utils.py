@@ -1,4 +1,5 @@
-LENGTH_DIFF_MAX = 3
+from utils.core import CLASSIFY_MAX_LENGTH_ERROR
+
 
 def names_are_similar(n_longest, n_equalized, ch_error, len_error):
     """
@@ -76,7 +77,7 @@ def suggest_similar_names(pokemon_name, data):
     """
     suggestions = set() 
     ch_error = len(pokemon_name) * 0.5
-    len_error = LENGTH_DIFF_MAX
+    len_error = CLASSIFY_MAX_LENGTH_ERROR
 
     for league in data.values():
         for name in league["Pokemon"]:

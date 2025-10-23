@@ -5,10 +5,11 @@ import queue
 import re
 from file_info import FileInfo
 from web_info import WebInfo
-from utils import core
 from web_utils import initialize_fetch_csv
 from file_utils import load_data, clear_terminal
 from classify_utils import suggest_similar_names
+
+from utils.core import USER_INPUT_IV_PATTERN
 
 
 class UIInfo(object):
@@ -265,7 +266,7 @@ class UIInfo(object):
         ivs = self.iv_entry.get().strip().lower()
         name = self.remove_shadow_label(name)
         
-        match = re.search(core.iv_pattern, ivs)
+        match = re.search(USER_INPUT_IV_PATTERN, ivs)
 
         if not match:
             self.display_ecode(msg="Invalid IV Format.", color="red2", row=1)

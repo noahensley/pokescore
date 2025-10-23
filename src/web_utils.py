@@ -17,17 +17,17 @@ import time
 import re
 import subprocess
 
-from utils import core
+from utils.core import PVPOKE_LEAGUE_URLS, PVPOKE_URL_PATTERN
 
 
 def initialize_fetch_csv(q, fi):
 
     gl_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(q,core.urls["great"],fi.data_path,))
+                                     args=(q,PVPOKE_LEAGUE_URLS["great"],fi.data_path,))
     ul_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(q,core.urls["ultra"],fi.data_path,))
+                                     args=(q,PVPOKE_LEAGUE_URLS["ultra"],fi.data_path,))
     ml_csv_thread = threading.Thread(target=fetch_csv, 
-                                     args=(q,core.urls["master"],fi.data_path,))
+                                     args=(q,PVPOKE_LEAGUE_URLS["master"],fi.data_path,))
     
     gl_csv_thread.start()
     ul_csv_thread.start()
@@ -42,7 +42,7 @@ def fetch_csv(q, src, dst):
     if type(src) != str:
         raise TypeError("Input URL must be a string.")
     
-    match = re.search(core.url_pattern, src)
+    match = re.search(PVPOKE_URL_PATTERN, src)
 
     if not match:
         raise RuntimeError("Unsupported URL format.")

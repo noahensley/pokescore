@@ -10,7 +10,8 @@ import time
 import re
 import pandas as pd
 import platform
-from utils import core
+
+from utils.core import PVPOKE_URL_PATTERN
 
 
 def relative_path(path_to_append=""):
@@ -23,7 +24,7 @@ def format_csv_filename(url):
     if type(url) != str:
         raise TypeError("Input URL must be a string.")
     
-    match = re.search(core.url_pattern, url)
+    match = re.search(PVPOKE_URL_PATTERN, url)
 
     if not match:
         raise RuntimeError("Unsupported URL format.")

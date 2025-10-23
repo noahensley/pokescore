@@ -9,7 +9,8 @@ import os
 import tempfile
 import shutil
 from file_utils import relative_path, format_csv_filename
-from utils import core
+
+from utils.core import PVPOKE_LEAGUE_URLS
 
 
 class FileInfo(object):
@@ -53,7 +54,7 @@ class FileInfo(object):
         # Checks the /data directory for exactly three
         #  .csv files
         target_files = []
-        for url in core.urls.values():
+        for url in PVPOKE_LEAGUE_URLS.values():
             target_files.append(format_csv_filename(url))
 
         downloaded_files = []
